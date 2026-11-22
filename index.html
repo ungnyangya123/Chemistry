@@ -283,7 +283,9 @@ function ART(key,c={}){
   case 'std6':{const id='inv'+(++ARTN),R6=rot('0 100 120;180 100 120;180 100 120;0 100 120',2.4),p='M95,58 V116 A28,28 0 1,0 105,116 V58 Z';
     return svgWrap(`<clipPath id="${id}"><path d="${p}">${R6}</path></clipPath><rect x="0" y="80" width="200" height="110" fill="${LQ}" clip-path="url(#${id})"/>
     <g>${R6}<path d="${p}" fill="none" stroke="${GL}" stroke-width="2"/><line x1="93" y1="78" x2="107" y2="78" stroke="#e2557a" stroke-width="1.6"/><rect x="94" y="48" width="12" height="11" rx="2" fill="#d8d2e6" stroke="${GL}"/><text x="100" y="148" font-size="8" text-anchor="middle" fill="#a0703a" font-family="Pretendard,sans-serif">${V}mL</text></g>`)}
-  case 'tit1':return svgWrap(`${volFlask(80,180,{levelAnim:'130;88;88',color:'#fff6d8',txt:'1/10 희석'})}<g transform="translate(116,74)">${washBottle(0,0,{squeeze:true,flip:true})}</g>${drop(85,54,84,LQ,0.8)}
+  case 'tit1':if(c.dil===1)return svgWrap(`${volFlask(80,180,{level:88,color:'#fff6d8',txt:'미지 산'})}
+    <rect x="128" y="120" width="34" height="56" rx="4" fill="#fff" stroke="${GL}"/><text x="145" y="150" font-size="8" text-anchor="middle" fill="#555" font-family="Pretendard">미지 산</text>`);
+    return svgWrap(`${volFlask(80,180,{levelAnim:'130;88;88',color:'#fff6d8',txt:'1/10 희석'})}<g transform="translate(116,74)">${washBottle(0,0,{squeeze:true,flip:true})}</g>${drop(85,54,84,LQ,0.8)}
     <rect x="128" y="120" width="34" height="56" rx="4" fill="#fff" stroke="${GL}"/><text x="145" y="150" font-size="8" text-anchor="middle" fill="#555" font-family="Pretendard">미지 산</text>`);
   case 'tit2':return svgWrap(`${erlen(100,180,{magnet:true,level:8})}${pipette(98,40)}${drop(100,124,170,'#fff6d8',0.9)}`);
   case 'tit3':return svgWrap(`${erlen(100,180,{magnet:true,color:'#fff6d8'})}${dropper(100,44)}${drop(100,96,160,'#fdf3f7',1)}${drop(100,96,160,'#fdf3f7',1,0.5)}
