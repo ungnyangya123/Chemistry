@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>화학 수행평가 대비 — 중화 적정 실험 설계</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#e2557a; --pink-soft:#fbe3ea; --lav:#efeaf8; --lav-deep:#7b6db3;
+  --ink:#1f1d2b; --sub:#6b6878; --line:#d9d5e3; --bg:#fff; --paper:#fbfafd;
+  --ok:#2f9e6b; --no:#d9434f;
+  --ui:'Pretendard',system-ui,sans-serif; --serif:'Noto Serif KR',serif; --title:'Black Han Sans','Pretendard',sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.7}
+button{font-family:var(--ui);cursor:pointer}
+.wrap{max-width:860px;margin:0 auto;padding:0 18px 80px;position:relative}
+/* 오른쪽 분홍 책갈피 (PDF 디자인) */
+.tab-mark{position:fixed;right:0;top:34%;width:28px;height:230px;white-space:nowrap;background:var(--pink-soft);border-left:3px solid var(--pink);writing-mode:vertical-rl;font:600 12px var(--ui);color:var(--pink);display:flex;align-items:center;justify-content:center;letter-spacing:.1em}
+header{padding:20px 0 10px;border-bottom:3px solid var(--ink)}
+.kicker{display:flex;justify-content:space-between;font:500 13px var(--ui);color:var(--sub)}
+.kicker b{color:var(--lav-deep)}
+.title-row{display:flex;align-items:center;gap:16px;margin:8px 0 14px}
+.badge-oval{border:2px solid var(--ink);border-radius:50%;padding:4px 16px;font:600 14px var(--ui);white-space:nowrap}
+h1{font-family:var(--title);font-weight:400;font-size:clamp(34px,7vw,58px);letter-spacing:.06em;margin:0;flex:1;text-align:center}
+.gear{border:0;background:none;font-size:24px;padding:6px}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.stat{display:flex;border:2px solid var(--ink);background:#fff}
+.stat span{padding:4px 10px;font:700 13px var(--ui);background:var(--lav);border-right:2px solid var(--ink)}
+.stat b{padding:4px 16px;font:600 16px var(--serif);min-width:56px;text-align:center}
+nav.main{display:flex;gap:4px;overflow-x:auto;padding:12px 0;border-bottom:1px solid var(--line)}
+nav.main button{border:2px solid transparent;background:none;font:700 16px var(--ui);padding:6px 14px;border-radius:999px;color:var(--sub);white-space:nowrap}
+nav.main button.on{border-color:var(--ink);color:var(--ink)}
+.chips{display:flex;gap:16px;flex-wrap:wrap;padding:12px 0}
+.chips button{border:0;background:none;font:500 15px var(--serif);display:flex;align-items:center;gap:6px;color:var(--ink)}
+.chips button::before{content:"";width:13px;height:17px;border:2px solid var(--pink);border-radius:50%}
+.chips button.on::before{background:var(--ink);border-color:var(--ink)}
+.chips button.on{font-weight:700}
+.sub{display:flex;gap:18px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:14px}
+.sub button{border:0;border-bottom:3px solid transparent;background:none;font:500 15px var(--serif);padding:8px 0;white-space:nowrap;color:var(--sub)}
+.sub button.on{border-color:var(--ink);color:var(--ink);font-weight:700}
+.tools{font:14px var(--serif);color:var(--sub);display:flex;gap:16px;margin-bottom:12px}
+.tools button{border:0;background:none;text-decoration:underline;color:var(--ink);font:14px var(--serif);padding:0}
+/* 문제 카드 (PDF: 번호 배지 + 별) */
+.q{display:flex;gap:16px;background:#fff;border:1px solid var(--line);padding:18px;margin-bottom:14px}
+.qno{flex:0 0 64px;text-align:center}
+.qno b{display:block;background:var(--lav-deep);color:#fff;font:400 30px var(--title);padding:6px 0}
+.qno i{font-style:normal;color:var(--pink);font-size:12px;letter-spacing:1px}
+.qbody{flex:1;min-width:0}
+.qbody .ask{font-weight:600;margin:0 0 10px}
+.box{border:1px solid #9d97b5;border-radius:6px;padding:12px 16px;margin:10px 0;background:#fff}
+.box .lab{display:inline-block;font:700 13px var(--ui);background:#fff;border:1px solid #9d97b5;border-radius:4px;padding:0 8px;margin-bottom:6px}
+.opts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.opts.cols2{grid-template-columns:repeat(2,1fr)}
+.opt{border:1.5px solid var(--line);background:#fff;padding:9px 6px;font:500 15px var(--serif);border-radius:6px}
+.opt:hover{border-color:var(--lav-deep)}
+.opt.ok{border-color:var(--ok);background:#e6f6ee}
+.opt.no{border-color:var(--no);background:#fdeaea}
+.fb{margin-top:12px;padding:10px 14px;border-left:4px solid var(--lav-deep);background:var(--lav);font-size:15px;display:none}
+.fb.show{display:block}
+.fb.good{border-color:var(--ok)} .fb.bad{border-color:var(--no)}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.btn{border:2px solid var(--ink);background:#fff;font:600 15px var(--ui);padding:9px 18px}
+.btn.dark{background:var(--ink);color:#fff}
+.btn:disabled{opacity:.35;cursor:default}
+.opt:disabled{color:var(--ink);cursor:default}
+.counter{width:56px;height:40px;border:2px solid var(--ink);position:relative;font:14px var(--serif);background:linear-gradient(to top right,transparent 48%,var(--ink) 49%,var(--ink) 51%,transparent 52%)}
+.counter .a{position:absolute;left:6px;top:0}.counter .b{position:absolute;right:5px;bottom:0}
+/* 과정 */
+.step{background:#fff;border:1px solid var(--line);margin-bottom:14px}
+.step summary{list-style:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:14px 16px;font-weight:600}
+.step summary::-webkit-details-marker{display:none}
+.num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--pink);color:#fff;font:700 15px var(--ui);display:flex;align-items:center;justify-content:center}
+.step .inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;padding:0 16px 16px}
+.photo{height:230px;background:var(--lav);border:1px dashed #a9a2c6;display:flex;align-items:center;justify-content:center;text-align:center;font:13px var(--ui);color:var(--sub);overflow:hidden}
+.photo img,.photo svg{width:100%;height:100%;object-fit:contain}
+.photo{background:#f4f1fb;border-style:solid}
+.photo img{background:#fff}
+.why{margin-top:10px;font-size:14px;background:var(--pink-soft);padding:8px 12px;border-radius:6px}
+.why b{color:var(--pink)}
+/* 순서 배열 */
+.pool,.answer{display:flex;flex-direction:column;gap:8px}
+.answer{min-height:60px;border:2px dashed var(--line);padding:10px;margin:10px 0;background:#fff}
+.card{border:1.5px solid var(--ink);background:#fff;padding:9px 12px;font:15px var(--serif);text-align:left;display:flex;gap:10px}
+.card .n{font:700 13px var(--ui);color:var(--pink);min-width:18px}
+.card.ok{border-color:var(--ok);background:#e6f6ee}.card.no{border-color:var(--no);background:#fdeaea}
+.blank{display:inline-block;min-width:96px;border-bottom:2px solid var(--pink);text-align:center;color:var(--pink);font-weight:700}
+input.ans{font:16px var(--serif);border:0;border-bottom:2px solid var(--ink);padding:6px 2px;width:100%;max-width:320px;background:transparent}
+.soon{background:#fff;border:1px solid var(--line);padding:22px}
+.soon h3{margin:0 0 8px;font-family:var(--ui)}
+table.rub{border-collapse:collapse;width:100%;font-size:14px;margin-top:10px}
+table.rub th,table.rub td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+table.rub th{background:var(--lav);font-family:var(--ui)}
+/* 설정 */
+dialog{border:2px solid var(--ink);padding:20px;max-width:420px;width:92%}
+dialog h3{margin:0 0 12px;font-family:var(--ui)}
+.set{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font:15px var(--ui)}
+.set small{display:block;color:var(--sub);font-size:12px}
+.tg{width:46px;height:26px;border-radius:13px;border:0;background:#ccc;position:relative}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.tg.on{background:var(--pink)}.tg.on::after{left:23px}
+.proto{font:12px var(--ui);color:#fff;background:var(--lav-deep);padding:2px 8px;border-radius:4px;margin-left:6px;vertical-align:middle}
+/* 애니메이션 */
+@keyframes drop{0%{transform:translateY(0);opacity:1}80%{opacity:1}100%{transform:translateY(46px);opacity:0}}
+@keyframes level{from{transform:translateY(0)}to{transform:translateY(40px)}}
+@keyframes pinkup{0%,70%{fill:#eef4fb}85%{fill:#f7c6d8}100%{fill:#ee86ad}}
+@keyframes fill{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
+.anim-drop{animation:drop 1s linear infinite}
+.anim-level{animation:level 8s linear infinite}
+.anim-pink{animation:pinkup 8s linear infinite}
+.anim-fill{transform-origin:50% 100%;animation:fill 5s ease-out infinite}
+@media(max-width:1000px){.tab-mark{display:none}}
+@media(max-width:620px){.step .inner{grid-template-columns:1fr}.opts{grid-template-columns:1fr 1fr}.q{flex-direction:column}.qno{flex:none;width:64px}.tab-mark{display:none}}
+
+.qimg{float:right;width:150px;max-height:170px;object-fit:cover;margin:0 0 8px 12px;border:1px solid var(--line)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 10px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:3px 12px;font:600 13px var(--ui);color:var(--sub)}
+.chip[aria-pressed=true]{border-color:var(--pink);color:var(--pink);background:var(--pink-soft)}
+.tbar{height:6px;background:var(--lav);margin:0 0 10px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--pink);transition:width 1s linear}
+.padwrap{position:relative;border:2px solid var(--ink);background:#fff;height:180px;touch-action:none;margin-top:8px}
+.padwrap canvas{width:100%;height:100%;display:block}
+.ph[hidden]{display:none}
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#b9b4c8;pointer-events:none;font:15px var(--ui)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.cands{font:14px var(--ui);color:var(--sub);margin-top:6px}
+textarea.ta{width:100%;min-height:110px;font:15px var(--serif);border:1.5px solid var(--line);padding:10px;resize:vertical;background:#fff}
+.hint{font:13px var(--ui);color:var(--sub);margin:4px 0}
+.ccard{background:#fff;border:1px solid var(--line);padding:18px 20px;margin-bottom:14px}
+.ccard h3{font:700 18px var(--ui);margin:0 0 8px;display:flex;gap:10px;align-items:center}
+.ccard h3 .num{flex:0 0 28px;height:28px;font-size:14px}
+.ccard .f{background:var(--lav);padding:8px 12px;border-radius:6px;margin:8px 0;font-weight:600}
+.ox{display:flex;gap:12px;margin-top:12px}
+.ox .opt{font:700 26px var(--ui);flex:1;padding:14px}
+.sec{background:#fff;border:1px solid var(--line);padding:16px 18px;margin-bottom:14px}
+.sec h3{font:700 16px var(--ui);margin:0 0 8px}
+.sec h3 small{color:var(--pink);font-weight:600;margin-left:6px}
+.field{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
+.field input{font:16px var(--serif);border:0;border-bottom:2px solid var(--ink);padding:4px;width:120px;background:transparent}
+.score3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.score3 div{border:2px solid var(--ink);background:#fff;text-align:center;padding:10px}
+.score3 b{display:block;font:400 40px var(--title)}
+.score3 span{font:700 14px var(--ui)}
+.score3 .s1{border-color:var(--no)}.score3 .s2{border-color:var(--lav-deep)}.score3 .s3{border-color:var(--ok)}
+td.k{white-space:nowrap}
+.lst{margin:0;padding-left:20px}
+.res-ok{color:var(--ok);font-weight:700}.res-no{color:var(--no);font-weight:700}
+.wl{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.animrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.animrow .photo{height:220px}
+.cap{font:13px var(--ui);color:var(--sub);text-align:center;margin-top:4px}
+@media(max-width:620px){.qimg{float:none;display:block;width:100%;max-height:200px;margin:0 0 10px}.score3 b{font-size:30px}.animrow{grid-template-columns:1fr}}
+
+footer.credit{margin-top:40px;padding:16px 0 4px;border-top:3px solid var(--ink);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font:13px var(--ui);color:var(--sub)}
+footer.credit b{color:var(--ink);font-size:14px}
+.photo{position:relative}
+.photo .cr{position:absolute;right:4px;bottom:3px;font:10px var(--ui);color:#fff;background:rgba(31,29,43,.55);padding:1px 6px;border-radius:3px;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;font:14px/1.5 var(--ui);padding:12px 18px;border-left:4px solid var(--pink);max-width:92%;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25);display:none}
+.toast.show{display:block}
+img{-webkit-user-drag:none;user-select:none}
+.qart{height:150px;padding:0;background:#f4f1fb}.qart svg{width:100%;height:100%;display:block}
+@media(max-width:620px){.qart{height:190px}}
+</style>
+</head>
+<body>
+<div class="tab-mark">PART 04 · 역동적인 화학 반응</div>
+<div class="wrap">
+<header>
+  <div class="kicker"><span>〔2026 2학기 화학 수행평가 대비〕</span><b>중화 반응의 양적 관계 · 정량 실험 설계</b></div>
+  <div class="title-row">
+    <span class="badge-oval">4단원</span>
+    <h1>중화 적정</h1>
+    <button class="gear" id="gear" aria-label="설정">⚙</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span>푼 문제</span><b id="sDone">0</b></div>
+    <div class="stat"><span>정답률</span><b id="sRate">–</b></div>
+    <div class="stat"><span>남은 오답</span><b id="sWrong">0</b></div>
+    <div class="stat"><span>수행평가 최고</span><b id="sBest">–</b></div>
+  </div>
+</header>
+<nav class="main" id="mainNav"></nav>
+<div class="chips" id="chips"></div>
+<div class="sub" id="subNav"></div>
+<main id="stage"></main>
+<footer class="credit"><b>20514 유성민 제작</b><span>실험 그림은 모두 직접 그린 일러스트예요</span></footer>
+</div>
+<div class="toast" id="toast"></div>
+<dialog id="settings">
+  <h3>설정</h3>
+  <div class="set"><div>손글씨 입력<small>기구 「직접 쓰기」에서 손으로 써서 답해요 (인터넷 필요)</small></div><button class="tg" data-k="hand"></button></div>
+  <div class="set"><div>자동 채점<small>손글씨를 멈추면 1.6초 뒤 자동으로 채점해요</small></div><button class="tg" data-k="auto"></button></div>
+  <div class="set"><div>타임어택<small>문제마다 제한 시간 · 수행평가 모드는 40분</small></div><button class="tg" data-k="ta"></button></div>
+  <div class="set"><div>손글씨 인식 난이도<small id="lvName"></small></div><input type="range" min="1" max="5" step="1" id="lv"></div>
+  <p class="hint">1 설렁설렁: 인식 후보 5개 안 + 한 글자 오타 허용 · 3 보통: 후보 3개 안 · 5 정자: 1순위로 읽혀야 정답</p>
+  <div style="text-align:right"><button class="btn dark" id="setClose">닫기</button></div>
+</dialog>
+<script>
+/* ===== 직접 그린 실험 그림 (SVG + 움직임) ===== */
+let ARTN=0;
+const GL='#6b6878',LQ='#cfe3f7',PK='#ee86ad';
+const svgWrap=inner=>`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="200" height="200" fill="#f4f1fb"/><rect y="182" width="200" height="18" fill="#e4e0ee"/>${inner}</svg>`;
+const anim=(attr,values,dur,extra='')=>`<animate attributeName="${attr}" values="${values}" dur="${dur}s" repeatCount="indefinite" ${extra}/>`;
+const rot=(values,dur)=>`<animateTransform attributeName="transform" type="rotate" values="${values}" dur="${dur}s" repeatCount="indefinite"/>`;
+const drop=(x,y1,y2,color=LQ,dur=1,begin=0)=>`<circle cx="${x}" cy="${y1}" r="2.6" fill="${color}" stroke="#7aa6d6" stroke-width=".6">${anim('cy',`${y1};${y2}`,dur,`begin="${begin}s"`)}${anim('opacity','1;1;0',dur,`begin="${begin}s"`)}</circle>`;
+const label=(x,y,t,lx,ly)=>`<line x1="${x}" y1="${y}" x2="${lx}" y2="${ly}" stroke="#9d97b5" stroke-width=".8"/><text x="${lx+(lx>x?3:-3)}" y="${ly+3}" font-size="9" fill="#4a4660" text-anchor="${lx>x?'start':'end'}" font-family="Pretendard,sans-serif">${t}</text>`;
+function volFlask(cx,b,{level=null,levelAnim=null,color=LQ,mark=true,stopper=false,txt=''}={}){
+  const id='vf'+(++ARTN);const p=`M${cx-5},${b-112} V${b-54} A28,28 0 1,0 ${cx+5},${b-54} V${b-112} Z`;
+  return `<clipPath id="${id}"><path d="${p}"/></clipPath>
+   <g clip-path="url(#${id})">${level!=null||levelAnim?`<rect x="${cx-40}" y="${level??b}" width="80" height="200" fill="${color}">${levelAnim?anim('y',levelAnim,5,'keyTimes="0;0.7;1"'):''}</rect>`:''}</g>
+   <path d="${p}" fill="none" stroke="${GL}" stroke-width="2"/>
+   ${mark?`<line x1="${cx-7}" y1="${b-92}" x2="${cx+7}" y2="${b-92}" stroke="#e2557a" stroke-width="1.6"/>`:''}
+   ${stopper?`<rect x="${cx-6}" y="${b-122}" width="12" height="11" rx="2" fill="#d8d2e6" stroke="${GL}"/>`:''}
+   ${txt?`<text x="${cx}" y="${b-22}" font-size="8" text-anchor="middle" fill="#a0703a" font-family="Pretendard,sans-serif">${txt}</text>`:''}`;
+}
+function erlen(cx,b,{color='#eef4fb',fillAnim=null,magnet=false,spin=false,level=26}={}){
+  const id='er'+(++ARTN);const p=`M${cx-7},${b-80} V${b-52} L${cx-33},${b-6} Q${cx-35},${b} ${cx-28},${b} H${cx+28} Q${cx+35},${b} ${cx+33},${b-6} L${cx+7},${b-52} V${b-80} Z`;
+  return `<clipPath id="${id}"><path d="${p}"/></clipPath>
+   <g clip-path="url(#${id})"><rect x="${cx-40}" y="${b-level}" width="80" height="${level}" fill="${color}">${fillAnim?anim('fill',fillAnim,fillAnim.split(';').length>3?8:1.6):''}</rect>
+   ${magnet?`<rect x="${cx-8}" y="${b-6}" width="16" height="4" rx="2" fill="#555">${spin?`<animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;0.25 1;1 1" dur="0.5s" repeatCount="indefinite"/>`:''}</rect>`:''}</g>
+   ${spin?'':''}<path d="${p}" fill="rgba(255,255,255,.35)" stroke="${GL}" stroke-width="2"/>`;
+}
+// 회전하는 자석은 중심이 어긋나지 않게 따로 그림
+function magnetSpin(cx,b){return `<g transform="translate(${cx},${b-4})"><rect x="-8" y="-2" width="16" height="4" rx="2" fill="#555"><animateTransform attributeName="transform" type="scale" values="1 1;0.2 1;1 1" dur="0.5s" repeatCount="indefinite"/></rect></g>`}
+function beaker(x,y,w,h,{level=0,color=LQ,particles=false}={}){
+  return `${level?`<rect x="${x+1}" y="${y+h-level}" width="${w-2}" height="${level}" fill="${color}"/>`:''}
+   ${particles?[0,1,2,3,4].map(i=>`<circle cx="${x+8+i*(w-16)/4}" cy="${y+h-4-(i%2)*4}" r="2.2" fill="#fff" stroke="#bbb">${anim('opacity','1;0.2;1',2.4,`begin="${i*0.3}s"`)}</circle>`).join(''):''}
+   <path d="M${x-5},${y-3} L${x},${y+2} V${y+h} H${x+w} V${y}" fill="rgba(255,255,255,.35)" stroke="${GL}" stroke-width="2" stroke-linejoin="round"/>
+   ${[0.3,0.5,0.7].map(f=>`<line x1="${x+w-8}" y1="${y+h*f}" x2="${x+w-2}" y2="${y+h*f}" stroke="#aaa"/>`).join('')}`;
+}
+function balance(x,y,txt){
+  return `<rect x="${x}" y="${y}" width="110" height="42" rx="6" fill="#e9e7ef" stroke="${GL}" stroke-width="1.5"/>
+   <rect x="${x+12}" y="${y+10}" width="56" height="18" rx="2" fill="#1f3b2d"/><text x="${x+64}" y="${y+23}" font-size="11" text-anchor="end" fill="#8ef0b0" font-family="monospace">${txt}</text>
+   ${[0,1,2].map(i=>`<circle cx="${x+80+i*10}" cy="${y+19}" r="3" fill="#bbb"/>`).join('')}
+   <rect x="${x+50}" y="${y-8}" width="10" height="8" fill="#ccc"/><ellipse cx="${x+55}" cy="${y-9}" rx="34" ry="5" fill="#d4d4d8" stroke="${GL}"/>`;
+}
+function washBottle(x,y,{squeeze=false,flip=false}={}){
+  const s=flip?-1:1;
+  return `<g transform="translate(${x},${y}) scale(${s},1)"><rect x="-14" y="0" width="28" height="44" rx="8" fill="#f8f8fb" stroke="${GL}" stroke-width="1.5">${squeeze?`<animate attributeName="width" values="28;24;28" dur="1s" repeatCount="indefinite"/><animate attributeName="x" values="-14;-12;-14" dur="1s" repeatCount="indefinite"/>`:''}</rect>
+   <rect x="-7" y="-6" width="14" height="7" fill="#f4d86b" stroke="${GL}"/><path d="M0,-6 V-14 Q0,-24 14,-26 L30,-22" fill="none" stroke="#e6c84a" stroke-width="3" stroke-linecap="round"/></g>`;
+}
+function stand(x,b,h=170){return `<rect x="${x-26}" y="${b-6}" width="96" height="8" rx="2" fill="#555"/><rect x="${x}" y="${b-h}" width="5" height="${h-6}" fill="#8a8a92"/>`}
+function burette(x,top,{len=110,level=null,levelAnim=null,open=false,funnel=false}={}){
+  const id='bu'+(++ARTN);
+  return `<clipPath id="${id}"><rect x="${x+1}" y="${top}" width="6" height="${len}"/></clipPath>
+   <g clip-path="url(#${id})">${level!=null?`<rect x="${x}" y="${top+level}" width="8" height="${len}" fill="${LQ}">${levelAnim?anim('y',levelAnim,8):''}</rect>`:''}</g>
+   <rect x="${x}" y="${top}" width="8" height="${len}" fill="rgba(255,255,255,.35)" stroke="${GL}" stroke-width="1.4"/>
+   ${Array.from({length:10},(_,i)=>`<line x1="${x}" y1="${top+8+i*len/11}" x2="${x+3}" y2="${top+8+i*len/11}" stroke="#a0703a" stroke-width=".7"/>`).join('')}
+   <path d="M${x+2},${top+len} V${top+len+10} L${x+4},${top+len+18} L${x+6},${top+len+10} V${top+len}" fill="${level!=null?LQ:'#fff'}" stroke="${GL}"/>
+   <rect x="${x-4}" y="${top+len+3}" width="16" height="4" fill="#3d6fb6"/><circle cx="${x+(open?18:-6)}" cy="${top+len+5}" r="3" fill="#3d6fb6"/>
+   ${funnel?`<path d="M${x-10},${top-16} L${x+18},${top-16} L${x+6},${top-2} V${top+6} H${x+2} V${top-2} Z" fill="rgba(255,255,255,.5)" stroke="${GL}"/>`:''}`;
+}
+function clamp(x,y){return `<rect x="${x}" y="${y}" width="34" height="5" fill="#555"/><circle cx="${x+3}" cy="${y+2.5}" r="4" fill="#3d6fb6"/><rect x="${x+32}" y="${y-4}" width="4" height="13" fill="#3d6fb6"/>`}
+function stirrer(cx,b){return `<rect x="${cx-44}" y="${b-18}" width="88" height="18" rx="3" fill="#ece9e0" stroke="${GL}"/><rect x="${cx-32}" y="${b-12}" width="7" height="7" fill="#d33"/><circle cx="${cx+18}" cy="${b-9}" r="5" fill="#2e7d4f"/>`}
+function pipette(x,top,{filler=true}={}){return `<rect x="${x}" y="${top}" width="4" height="70" fill="rgba(255,255,255,.6)" stroke="${GL}"/><ellipse cx="${x+2}" cy="${top+42}" rx="5" ry="10" fill="${LQ}" stroke="${GL}"/>
+   <path d="M${x},${top+70} L${x+2},${top+80} L${x+4},${top+70}" fill="${LQ}" stroke="${GL}"/>${filler?`<ellipse cx="${x+2}" cy="${top-9}" rx="8" ry="10" fill="#d94b4b"/><rect x="${x-1}" y="${top-2}" width="6" height="6" fill="#a33"/>`:''}`}
+function dropper(x,top){return `<ellipse cx="${x}" cy="${top}" rx="6" ry="9" fill="#d94b4b"/><rect x="${x-2.5}" y="${top+7}" width="5" height="34" fill="rgba(255,255,255,.7)" stroke="${GL}"/><path d="M${x-2.5},${top+41} L${x},${top+49} L${x+2.5},${top+41}" fill="#fff" stroke="${GL}"/>`}
+function reading(v,cap){
+  const sp=6,cy=96;const lo=v-1.4,hi=v+1.4;let ticks='';
+  for(let t=Math.ceil(lo*10)/10;t<=hi+1e-9;t=+(t+0.1).toFixed(1)){const y=cy+(t-v)*10*sp;const major=Math.abs(t-Math.round(t))<1e-9;
+    ticks+=`<line x1="70" y1="${y}" x2="${major?96:84}" y2="${y}" stroke="#a0703a" stroke-width="${major?1.4:.8}"/>${major?`<text x="100" y="${y+4}" font-size="11" fill="#a0703a" font-family="Pretendard,sans-serif">${Math.round(t)}</text>`:''}`}
+  return svgWrap(`<rect x="66" y="14" width="60" height="164" fill="#fff" stroke="${GL}" stroke-width="2"/><clipPath id="rd${++ARTN}"><rect x="67" y="15" width="58" height="162"/></clipPath>
+   <g clip-path="url(#rd${ARTN})"><path d="M66,${cy-6} Q96,${cy+6} 126,${cy-6} V180 H66 Z" fill="${LQ}"/>${ticks}</g>
+   <line x1="40" y1="${cy}" x2="150" y2="${cy}" stroke="#e2557a" stroke-dasharray="4 3"/><circle cx="26" cy="${cy}" r="9" fill="#fff" stroke="${GL}"/><circle cx="29" cy="${cy}" r="4" fill="#333"/>
+   <text x="100" y="196" font-size="10" text-anchor="middle" fill="#4a4660" font-family="Pretendard,sans-serif">${cap} ${v.toFixed(2)} mL (오목한 면 아래쪽)</text>`);
+}
+function ART(key,c={}){
+  const mass=c.mass!=null?fmt(c.mass):'4';const V=c.V||250;
+  switch(key){
+  case 'std1':return svgWrap(`${balance(45,128,mass+' g')}<path d="M76,118 L80,114 H120 L124,118 Z" fill="#fff" stroke="${GL}"/><path d="M88,115 Q100,104 112,115 Z" fill="#fff" stroke="#bbb"/>
+    <g>${rot('0 150 70;-10 150 70;0 150 70',2)}<line x1="104" y1="104" x2="175" y2="60" stroke="#999" stroke-width="3" stroke-linecap="round"/><ellipse cx="104" cy="104" rx="6" ry="3" fill="#bbb"/></g>
+    <rect x="20" y="132" width="20" height="40" rx="3" fill="#fff" stroke="${GL}"/><text x="30" y="155" font-size="7" text-anchor="middle" fill="#555" font-family="Pretendard">시약</text>`);
+  case 'std2':return svgWrap(`${beaker(60,100,80,80,{level:48,particles:true})}<g>${rot('-8 100 60;8 100 60;-8 100 60',1.2)}<line x1="100" y1="20" x2="100" y2="172" stroke="#b9c6d8" stroke-width="4" stroke-linecap="round"/></g>`);
+  case 'std3':return svgWrap(`${volFlask(80,180,{level:150,txt:V+'mL'})}<path d="M64,38 H96 L84,58 V72 H76 V58 Z" fill="rgba(255,255,255,.6)" stroke="${GL}"/>
+    <g transform="translate(94,34) rotate(-58) translate(-125,-37)">${beaker(130,40,30,36,{level:8})}</g>
+    <path d="M92,35 Q87,42 84,54" fill="none" stroke="#9cc4ec" stroke-width="3" stroke-linecap="round">${anim('stroke-dasharray','0 30;30 0',0.9)}</path>`);
+  case 'std4':return svgWrap(`<g>${rot('-14 100 130;14 100 130;-14 100 130',0.8)}${volFlask(100,180,{level:140,stopper:true,txt:V+'mL'})}</g>`);
+  case 'std5':return svgWrap(`${volFlask(90,180,{levelAnim:'120;88;88',txt:V+'mL'})}<g transform="translate(126,74)">${washBottle(0,0,{squeeze:true,flip:true})}</g>${drop(95,54,84,LQ,0.8)}
+    <circle cx="40" cy="88" r="8" fill="#fff" stroke="${GL}"/><circle cx="43" cy="88" r="3.5" fill="#333"/><line x1="50" y1="88" x2="96" y2="88" stroke="#e2557a" stroke-dasharray="3 3"/>`);
+  case 'std6':{const id='inv'+(++ARTN),R6=rot('0 100 120;180 100 120;180 100 120;0 100 120',2.4),p='M95,58 V116 A28,28 0 1,0 105,116 V58 Z';
+    return svgWrap(`<clipPath id="${id}"><path d="${p}">${R6}</path></clipPath><rect x="0" y="80" width="200" height="110" fill="${LQ}" clip-path="url(#${id})"/>
+    <g>${R6}<path d="${p}" fill="none" stroke="${GL}" stroke-width="2"/><line x1="93" y1="78" x2="107" y2="78" stroke="#e2557a" stroke-width="1.6"/><rect x="94" y="48" width="12" height="11" rx="2" fill="#d8d2e6" stroke="${GL}"/><text x="100" y="148" font-size="8" text-anchor="middle" fill="#a0703a" font-family="Pretendard,sans-serif">${V}mL</text></g>`)}
+  case 'tit1':return svgWrap(`${volFlask(80,180,{levelAnim:'130;88;88',color:'#fff6d8',txt:'1/10 희석'})}<g transform="translate(116,74)">${washBottle(0,0,{squeeze:true,flip:true})}</g>${drop(85,54,84,LQ,0.8)}
+    <rect x="128" y="120" width="34" height="56" rx="4" fill="#fff" stroke="${GL}"/><text x="145" y="150" font-size="8" text-anchor="middle" fill="#555" font-family="Pretendard">미지 산</text>`);
+  case 'tit2':return svgWrap(`${erlen(100,180,{magnet:true,level:8})}${pipette(98,40)}${drop(100,124,170,'#fff6d8',0.9)}`);
+  case 'tit3':return svgWrap(`${erlen(100,180,{magnet:true,color:'#fff6d8'})}${dropper(100,44)}${drop(100,96,160,'#fdf3f7',1)}${drop(100,96,160,'#fdf3f7',1,0.5)}
+    <rect x="140" y="140" width="24" height="38" rx="3" fill="#fff" stroke="${GL}"/><text x="152" y="162" font-size="6" text-anchor="middle" fill="#555" font-family="Pretendard">페놀프탈레인</text>`);
+  case 'tit4':return svgWrap(`${stand(60,184)}${clamp(64,110)}${burette(92,40,{len:110,level:60,levelAnim:'100;20;20',funnel:true})}
+    <g transform="rotate(-50 130 20)">${beaker(120,6,34,40,{level:22})}</g><path d="M110,20 Q102,18 98,24" fill="none" stroke="${LQ}" stroke-width="3">${anim('stroke-dasharray','0 30;30 0',1)}</path>`);
+  case 'tit5':return svgWrap(`${stand(60,184)}${clamp(64,60)}${burette(92,14,{len:110,level:4,open:true})}${beaker(80,148,32,32,{level:6})}${drop(96,144,172,LQ,0.6)}${drop(96,144,172,LQ,0.6,0.3)}`);
+  case 'tit6':return reading(c.runs?c.runs[0][0]:0.4,'처음 눈금');
+  case 'tit7':return svgWrap(`${stand(40,184)}${clamp(44,50)}${burette(92,14,{len:108,level:10,levelAnim:'10;40;10',open:true})}${stirrer(96,184)}${erlen(96,166,{level:24})}${magnetSpin(96,166)}${drop(96,140,150,LQ,0.8)}`);
+  case 'tit8':return svgWrap(`${stand(40,184)}${clamp(44,50)}${burette(92,14,{len:108,level:44,open:true})}${stirrer(96,184)}${erlen(96,166,{level:24,fillAnim:'#eef4fb;#f6c4d9;#eef4fb'})}${magnetSpin(96,166)}${drop(96,140,150,LQ,1.6)}`);
+  case 'tit9':return svgWrap(`${stand(40,184)}${clamp(44,50)}${burette(92,14,{len:108,level:48})}${stirrer(96,184)}${erlen(96,166,{level:24,color:PK})}${magnetSpin(96,166)}
+    <text x="150" y="120" font-size="10" fill="#e2557a" font-family="Pretendard,sans-serif">전체가</text><text x="150" y="134" font-size="10" fill="#e2557a" font-family="Pretendard,sans-serif">붉은색!</text>`);
+  case 'tit10':return reading(c.runs?c.runs[0][1]:20.3,'나중 눈금');
+  case 'setup':case 'setupL':{const L=key==='setupL';
+    return svgWrap(`${stand(40,184)}${clamp(44,50)}${burette(92,14,{len:108,level:12})}${stirrer(96,184)}${erlen(96,166,{level:24})}${magnetSpin(96,166)}
+    ${L?label(96,60,'뷰렛',150,40)+label(70,52,'뷰렛 집게',150,62)+label(42,100,'스탠드',20,120)+label(110,150,'삼각 플라스크',150,140)+label(130,176,'교반기',160,165)+label(96,162,'교반 자석',150,152):''}`)}
+  case 'endpoint':return svgWrap(`${stirrer(100,184)}${erlen(100,166,{level:30,fillAnim:'#eef4fb;#eef4fb;#f6c4d9;'+PK})}${magnetSpin(100,166)}
+    <text x="100" y="40" font-size="11" text-anchor="middle" fill="#4a4660" font-family="Pretendard,sans-serif">무색 → 붉은색 (중화점 지남)</text>`);
+  }
+  return svgWrap('');
+}
+
+/* ===== 기본 도구 ===== */
+const $=id=>document.getElementById(id);
+const DEF={done:0,right:0,wrong:{},tools:{},best:null,prefs:{hand:false,auto:false,ta:false,lv:3}};
+let S;try{S=JSON.parse(localStorage.getItem('chemS'))}catch(e){}
+S=Object.assign({},DEF,S||{});S.prefs=Object.assign({},DEF.prefs,S.prefs||{});
+function save(){try{localStorage.setItem('chemS',JSON.stringify(S))}catch(e){}drawStats()}
+function drawStats(){$('sDone').textContent=S.done;$('sRate').textContent=S.done?Math.round(S.right/S.done*100)+'%':'–';
+  $('sWrong').textContent=Object.keys(S.wrong).length;$('sBest').textContent=S.best==null?'–':S.best}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=x=>String(+(+x).toFixed(4));
+const nice=x=>Math.abs(x*1000-Math.round(x*1000))<1e-7;
+const hasJong=w=>{const c=w.charCodeAt(w.length-1)-0xAC00;return c>=0&&c<11172&&c%28>0};
+const ieyo=w=>w+(hasJong(w)?'이에요':'예요');
+const KA='가나다라마바사아자차카타';
+
+/* ===== 랜덤 조건 (교과서 수치를 그대로 쓰지 않음) ===== */
+const BASES=[{f:'NaOH',name:'수산화 나트륨',mw:40},{f:'KOH',name:'수산화 칼륨',mw:56}];
+const ACIDS=[{f:'HCl',plain:'HCl',name:'염산',n:1},{f:'H₂SO₄',plain:'H2SO4',name:'황산',n:2},{f:'CH₃COOH',plain:'CH3COOH',name:'아세트산',n:1}];
+function makeStd(base){
+  const s=base||pick(BASES);
+  const M=pick([0.05,0.1,0.2,0.25,0.5]),V=pick([100,250,500,1000]);
+  return {...s,M,V,mol:M*V/1000,mass:+(M*V/1000*s.mw).toFixed(4)};
+}
+function makeTit(Mb,base){
+  const b=base||BASES[0];
+  for(let k=0;k<500;k++){
+    const acid=pick(ACIDS),mb=Mb||pick([0.1,0.2,0.25]),Va=pick([10,20,25]),Vb=pick([8,10,12,12.5,15,16,18,20,24,25,30]);
+    const dil=Math.random()<.5?10:1,Ma=mb*Vb/(acid.n*Va);
+    if(!nice(Ma)||!nice(Ma*dil))continue;
+    const off=shuffle([0.02,0,-0.02]);
+    const runs=off.map(o=>{const s=+(Math.random()*0.9).toFixed(2);return [s,+(s+Vb+o).toFixed(2)]}); // 매 회 뷰렛을 다시 채워 0 근처에서 시작
+    return {acid,base:b,Mb:mb,Va,Vb,dil,Ma,orig:Ma*dil,runs};
+  }
+}
+
+/* ===== 실험 과정 데이터 ===== */
+const STD_STEPS=c=>[
+  {t:`전자저울로 ${c.f}(s) ${fmt(c.mass)} g을 정확히 잰다.`,why:`몰수 = ${c.M} M × ${fmt(c.V/1000)} L = ${fmt(c.mol)} mol → 질량 = ${fmt(c.mol)} mol × ${c.mw} = ${fmt(c.mass)} g`,img:'std1'},
+  {t:'비커에 넣고 증류수를 적당량 부어 유리 막대로 저어 녹인다.',why:'고체를 부피 플라스크에 바로 넣지 않고 비커에서 먼저 녹여요.',img:'std2'},
+  {t:`깔때기로 ${c.V} mL 부피 플라스크에 옮기고, 비커를 증류수로 여러 번 헹궈 함께 넣는다.`,why:'비커와 유리 막대에 남은 용질까지 모두 옮겨야 농도가 정확해요.',img:'std3'},
+  {t:'마개를 닫고 흔들어 섞는다.',why:'표시선까지 채우기 전에 한 번 섞어 줘요.',img:'std4'},
+  {t:'씻기병으로 증류수를 표시선까지 정확히 채운다.',why:'눈높이를 표시선에 맞추고, 오목한 면(메니스커스)의 <b>가장 아래쪽</b>을 표시선에 맞춰요.',img:'std5'},
+  {t:'마개를 닫고 뒤집어 가며 여러 번 흔들어 섞는다.',why:'용액 전체의 농도를 고르게 만들어요.',img:'std6'},
+];
+const TIT_STEPS=c=>[
+  {t:`부피 플라스크로 미지 농도의 ${c.acid.f}(aq)을 ${c.dil===10?'1/10로 희석한다.':'정확한 부피만큼 준비한다.'}`,why:'농도를 모르는 산이 진할 수 있으니 묽혀서 쓰면 좋아요. 희석했다면 마지막에 희석 배수를 곱해야 해요.',img:'tit1'},
+  {t:`삼각 플라스크에 교반 자석을 넣고, 피펫으로 ${c.acid.f}(aq) ${c.Va} mL를 넣는다.`,why:'피펫에 용액을 빨아올릴 때는 입 대신 피펫 필러를 써요.',img:'tit2'},
+  {t:'스포이드로 페놀프탈레인 용액을 2~3방울 떨어뜨린다.',why:'페놀프탈레인은 산성·중성에서 무색, 염기성에서 붉은색이에요.',img:'tit3'},
+  {t:`깔때기로 ${c.Mb} M ${c.base.f}(aq)을 뷰렛에 넣는다.`,why:'넣은 뒤에는 깔때기를 빼야 방울이 떨어져 눈금이 바뀌지 않아요.',img:'tit4'},
+  {t:`뷰렛 아래에 빈 비커를 대고 꼭지를 열어 꼭지 아래까지 ${c.base.f}(aq)을 채운 뒤 잠근다.`,why:'꼭지 아래 공기를 빼야 부피를 정확히 잴 수 있어요.',img:'tit5'},
+  {t:'뷰렛의 처음 눈금을 읽어 기록한다.',why:'눈금은 최소 눈금의 1/10까지 어림해서 읽어요.',img:'tit6'},
+  {t:`교반기를 작동하고 ${c.base.f}(aq)을 천천히 떨어뜨린다.`,why:'교반기에서 삼각 플라스크를 뺄 때는 다이얼을 0으로 해요.',img:'tit7'},
+  {t:'붉은색이 나타나기 시작하면 꼭지를 조절해 소량씩 떨어뜨린다.',why:'중화점 근처에서는 한 방울로도 색이 바뀌어요.',img:'tit8'},
+  {t:'용액 전체가 붉은색으로 변하는 순간 꼭지를 잠근다.',why:'이 지점(종말점)이 중화점에 가장 가까운 지점이에요.',img:'tit9'},
+  {t:'뷰렛의 나중 눈금을 읽어 기록한다.',why:'넣어 준 부피 = 나중 눈금 − 처음 눈금',img:'tit10'},
+];
+const STD_WRONG=['부피 플라스크에 고체 시료를 바로 넣고 표시선까지 증류수를 채운다.','메니스커스의 가장 위쪽을 표시선에 맞춘다.','비커는 헹구지 않고 녹인 용액만 옮긴다.','시료를 녹인 뒤 증류수 100 mL를 더 부어 준다.'];
+
+/* ===== 기구·물품 ===== */
+const STD_TOOLS=['부피 플라스크','비커','전자저울','약숟가락','깔때기','질량 접시','씻기병','유리 막대'];
+const TIT_TOOLS=['뷰렛','뷰렛 집게','스탠드','삼각 플라스크','교반기','교반 자석','피펫','피펫 필러','스포이드','깔때기','부피 플라스크','비커'];
+const SAFE=['실험복','보안경','실험용 장갑','마스크'];
+const ALL_TOOLS=[...new Set([...STD_TOOLS,...TIT_TOOLS])];
+// 이름 비교용 별칭. [0]=엄격에서도 인정, [1]=보통부터 인정
+const ALIAS={
+  '부피 플라스크':[[],['메스플라스크','메스 플라스크','부피플라스크']],
+  '비커':[[],[]],'전자저울':[['전자 저울'],['저울','전자천칭']],'약숟가락':[['약 숟가락'],['스푼','약수저','시약 숟가락']],
+  '깔때기':[[],['깔대기','깔떼기']],'질량 접시':[['칭량 접시'],['약포지','칭량지','무게 접시']],'씻기병':[['씻기 병'],['세척병','세척 병','증류수병','워시보틀']],
+  '유리 막대':[[],['유리봉','젓개','교반 막대']],'뷰렛':[[],['뷰렡','buret','burette']],'뷰렛 집게':[[],['뷰렛 클램프','클램프','집게']],
+  '스탠드':[[],['스탠드대','받침대']],'삼각 플라스크':[[],['삼각플라스크','엘렌마이어 플라스크']],'교반기':[['자석 교반기'],['마그네틱 교반기','핫플레이트']],
+  '교반 자석':[[],['마그네틱 바','교반자석','자석']],'피펫':[['홀 피펫','눈금 피펫'],['피펫트','파이펫']],'피펫 필러':[['안전 피펫 필러'],['안전 피펫','고무 필러','필러']],
+  '스포이드':[['스포이트'],['점적기','드로퍼']],
+  '실험복':[['실험 가운'],['가운','실험용 가운','실험가운']],'보안경':[['보호 안경'],['고글','보안 안경','안경']],
+  '실험용 장갑':[['실험 장갑'],['장갑','고무장갑','니트릴 장갑','라텍스 장갑','보호 장갑']],'마스크':[[],['방진 마스크']],
+};
+const sp=s=>String(s).replace(/\s+/g,'').toLowerCase().replace(/[₀-₉]/g,d=>'₀₁₂₃₄₅₆₇₈₉'.indexOf(d));
+function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>1)return 9;const d=Array.from({length:m+1},(_,i)=>[i]);for(let j=1;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+function names(item,level){const a=ALIAS[item]||[[],[]];return [item,...a[0],...(level>=2?a[1]:[])].map(sp)}
+// level: 1 엄격, 2 보통, 3 관대
+function sameName(input,item,level=2){const x=sp(input);if(!x)return false;const ns=names(item,level);
+  if(ns.includes(x))return true;if(level>=3)return ns.some(n=>n.length>=3&&lev(x,n)<=1);return false}
+function lineHas(line,item,level){const x=sp(line);const ns=names(item,level);
+  if(ns.some(n=>x.includes(n)))return true;
+  if(level>=3)return ns.some(n=>{if(n.length<3)return false;for(let i=0;i+n.length-1<=x.length;i++)for(const L of [n.length-1,n.length,n.length+1])if(lev(x.substr(i,L),n)<=1)return true;return false});
+  return false}
+
+/* ===== 화면 상태 ===== */
+const TABS={
+  concept:{n:'개념',sub:[['card','개념 카드'],['ox','O/X 확인']]},
+  proc:{n:'과정',sub:[['std','표준 용액 제조'],['tit','중화 적정'],['anim','움직임으로 보기']]},
+  order:{n:'순서',sub:[['orderAll','전체 배열'],['orderMiss','빠진 단계 채우기'],['orderSwap','바뀐 순서 찾기']]},
+  tool:{n:'기구',sub:[['toolChoose','고르기'],['toolWrite','직접 쓰기'],['toolList','준비물 다 쓰기']]},
+  calc:{n:'계산',sub:[['calcMass','시료 질량'],['calcDil','희석'],['calcPoint','이론적 중화점'],['calcUnknown','미지 농도'],['calcReal','실전 유형']]},
+  final:{n:'파이널',sub:[]},
+  wrong:{n:'오답',sub:[]},
+};
+const V={tab:'concept',sub:'card',range:'all'};
+let QN=0;
+function nav(){
+  stopTimer();
+  $('mainNav').innerHTML=Object.entries(TABS).map(([k,t])=>`<button class="${k===V.tab?'on':''}" data-tab="${k}">${t.n}</button>`).join('');
+  const showRange=['order','tool'].includes(V.tab);
+  $('chips').innerHTML=showRange?[['all','전체'],['std','표준 용액 제조'],['tit','중화 적정']].map(([k,n])=>`<button class="${k===V.range?'on':''}" data-range="${k}">${n}</button>`).join(''):'';
+  $('subNav').innerHTML=TABS[V.tab].sub.map(([k,n])=>`<button class="${k===V.sub?'on':''}" data-sub="${k}">${n}</button>`).join('');
+  $('subNav').style.display=TABS[V.tab].sub.length?'':'none';
+  render();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-tab],[data-sub],[data-range]');if(!b)return;
+  if(b.dataset.tab){V.tab=b.dataset.tab;V.sub=(TABS[V.tab].sub[0]||[])[0];QN=0}
+  if(b.dataset.sub){V.sub=b.dataset.sub;QN=0}
+  if(b.dataset.range)V.range=b.dataset.range;
+  nav();
+});
+function render(){
+  const t=V.tab;
+  if(t==='concept')return V.sub==='card'?renderConcept():single('ox');
+  if(t==='proc')return V.sub==='anim'?renderAnim():renderProc();
+  if(['order','tool','calc'].includes(t))return single(V.sub);
+  if(t==='final')return renderFinal();
+  if(t==='wrong')return renderWrong();
+}
+
+/* ===== 타이머 ===== */
+let TM=null;
+function stopTimer(){if(TM){clearInterval(TM.id);TM=null}}
+function startTimer(sec,onEnd){stopTimer();const bar=$('tbar');if(!bar)return;const t0=Date.now();
+  TM={id:setInterval(()=>{const left=sec-(Date.now()-t0)/1000;bar.style.width=Math.max(0,left/sec*100)+'%';$('tleft').textContent=Math.max(0,Math.ceil(left))+'초';
+    if(left<=0){stopTimer();onEnd()}},250)}}
+
+/* ===== 문제 공통 틀 ===== */
+const head=(no,stars,ask)=>`<div class="qno"><b>${String(no).padStart(2,'0')}</b><i>${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</i></div><div class="qbody"><p class="ask">${ask}</p>`;
+function record(key,label,ok){S.done++;if(ok){S.right++;if(S.wrong[key]){S.wrong[key].n--;if(S.wrong[key].n<=0)delete S.wrong[key]}}
+  else{S.wrong[key]=S.wrong[key]||{label,n:0};S.wrong[key].n++}save()}
+// opts: {onAnswer(ok), next(), nextLabel, index:[i,n]}
+function mountQ(type,opts={}){
+  stopTimer();QN++;
+  const q=MAKERS[type](opts.range||V.range);
+  const ctx={answered:false};
+  const quick=`<div class="quick"><button class="chip" data-q="ta" aria-pressed="${S.prefs.ta}">타임어택 ${S.prefs.ta?'켬':'끔'}</button>${q.hand?`<button class="chip" data-q="hand" aria-pressed="${S.prefs.hand}">손글씨 ${S.prefs.hand?'켬':'끔'}</button>${S.prefs.hand?`<button class="chip" data-q="auto" aria-pressed="${S.prefs.auto}">자동 채점 ${S.prefs.auto?'켬':'끔'}</button>`:''}`:''}</div>`;
+  const idx=opts.index?`<div class="counter"><span class="a">${opts.index[0]}</span><span class="b">${opts.index[1]}</span></div>`:'<span></span>';
+  $('stage').innerHTML=`<div class="q">${head(opts.index?opts.index[0]:QN,q.stars,q.ask)}${quick}
+    ${S.prefs.ta?`<div class="tbar"><i id="tbar" style="width:100%"></i></div><div class="hint" style="text-align:right;margin-top:-6px">남은 시간 <b id="tleft"></b></div>`:''}
+    ${q.body}<div class="fb" id="fb"></div>
+    <div class="nav-row">${opts.index?'<span></span>':`<button class="btn" id="qskip">건너뛰기</button>`}${idx}<button class="btn dark" id="qnext" ${opts.index?'disabled':''}>${opts.nextLabel||'다음'}</button></div></div></div>`;
+  const st=$('stage');
+  st.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const k=b.dataset.q;S.prefs[k]=!S.prefs[k];save();QN--;mountQ(type,opts)});
+  ctx.finish=(ok,html)=>{if(ctx.answered)return;ctx.answered=true;stopTimer();record(q.key||type,q.label,ok);
+    const f=$('fb');f.className='fb show '+(ok?'good':'bad');f.innerHTML=(ok?'<b>정답!</b> ':'<b>아쉬워요.</b> ')+(html||'');
+    if(q.onFinish)q.onFinish(ok);const n=$('qnext');n.disabled=false;n.focus({preventScroll:true});opts.onAnswer&&opts.onAnswer(ok,q.label)};
+  q.setup(st,ctx);
+  $('qnext').onclick=()=>opts.next?opts.next():mountQ(type,opts);
+  const sk=$('qskip');if(sk)sk.onclick=()=>{QN--;mountQ(type,opts)};
+  if(S.prefs.ta)startTimer(q.time||60,()=>{if(!ctx.answered){q.reveal?q.reveal(st,ctx):ctx.finish(false,'시간이 끝났어요.')}});
+}
+function single(type){mountQ(type)}
+// 객관식 공통
+function mcq(st,ctx,correct,explain,sel='.opt'){
+  const bs=[...st.querySelectorAll(sel)];
+  const show=(b)=>{bs.forEach(x=>{x.disabled=true;if(x.dataset.v===correct)x.classList.add('ok')});if(b&&b.dataset.v!==correct)b.classList.add('no')};
+  bs.forEach(b=>b.onclick=()=>{if(ctx.answered)return;show(b);ctx.finish(b.dataset.v===correct,explain)});
+  return ()=>{show(null);ctx.finish(false,'시간이 끝났어요. '+explain)};
+}
+const optBtns=(arr,cls='')=>`<div class="opts ${cls}">${arr.map((o,i)=>`<button class="opt" data-v="${o}">${arr.length===5?'①②③④⑤'[i]+' ':''}${o}</button>`).join('')}</div>`;
+function numOpts(ans,cands){const s=new Set([fmt(ans)]);for(const x of cands){if(s.size>=5)break;if(x>0&&isFinite(x))s.add(fmt(x))}let k=3;while(s.size<5)s.add(fmt(ans*k++));
+  return [...s].sort((a,b)=>a-b)}
+
+/* ===== 순서 위젯 ===== */
+function orderWidget(el,items,{onChange}={}){
+  // items: [{id,t}] ; 사용자가 누른 순서대로 쌓음
+  const w={pool:shuffle(items),ans:[],locked:false,marks:null};
+  function draw(){
+    el.innerHTML=`<p class="hint">아래 카드를 순서대로 누르세요. 위에 놓인 카드를 누르면 되돌아가요.</p>
+     <div class="answer">${w.ans.map((s,j)=>`<button class="card ${w.marks?(w.marks[j]?'ok':'no'):''}" data-back="${j}"><span class="n">${j+1}</span>${s.t}</button>`).join('')||'<span class="hint">여기에 순서대로 쌓여요</span>'}</div>
+     <div class="pool">${w.pool.map((s,j)=>`<button class="card" data-put="${j}"><span class="n">·</span>${s.t}</button>`).join('')}</div>`;
+    el.querySelectorAll('[data-put]').forEach(b=>b.onclick=()=>{if(w.locked)return;w.ans.push(w.pool.splice(+b.dataset.put,1)[0]);draw();onChange&&onChange()});
+    el.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{if(w.locked)return;w.pool.push(w.ans.splice(+b.dataset.back,1)[0]);draw();onChange&&onChange()});
+  }
+  w.draw=draw;draw();return w;
+}
+
+/* ===== 문제 만들기 ===== */
+const rangeOf=r=>r==='all'?pick(['std','tit']):r;
+const stepsOf=r=>{if(r==='tit'){const c=makeTit();return {c,steps:TIT_STEPS(c),name:'중화 적정'}}const c=makeStd();return {c,steps:STD_STEPS(c),name:'표준 용액 제조'}};
+const MAKERS={
+  ox(){const it=pick(OX());return {label:'개념 O/X',stars:1,time:20,key:'ox',ask:'다음 설명이 옳으면 O, 틀리면 X를 고르시오.',
+    body:`<div class="box">${it.s}</div><div class="ox"><button class="opt" data-v="O">O</button><button class="opt" data-v="X">X</button></div>`,
+    setup(st,ctx){this.reveal=mcq(st,ctx,it.a?'O':'X',it.e)}}},
+  orderAll(r){const R=rangeOf(r),{steps,name}=stepsOf(R);let w;
+    return {label:name+' 순서 배열',key:'orderAll-'+R,stars:3,time:R==='tit'?150:90,ask:`${name} 과정을 올바른 순서로 배열하시오.`,
+      body:`<div id="ow"></div><div class="row"><button class="btn dark" id="og" disabled>채점</button></div>`,
+      setup(st,ctx){w=orderWidget($('ow'),steps.map((s,i)=>({id:i,t:s.t})),{onChange:()=>{$('og').disabled=w.pool.length>0}});
+        const grade=()=>{w.locked=true;const all=[...w.ans,...w.pool];w.marks=all.map((s,j)=>s.id===j);w.ans=all;w.pool=[];w.draw();$('og').disabled=true;
+          const right=w.marks.filter(Boolean).length,ok=right===steps.length;
+          ctx.finish(ok,ok?'모든 단계가 제자리예요.':`${right}/${steps.length}단계가 제자리예요.<br><b>정답 순서</b><ol class="lst">${steps.map(s=>`<li>${s.t}</li>`).join('')}</ol>`)};
+        $('og').onclick=grade;this.reveal=grade}}},
+  orderMiss(r){const R=rangeOf(r),{steps,name}=stepsOf(R);const k=Math.floor(Math.random()*steps.length);
+    const opts=shuffle([steps[k].t,...shuffle(steps.filter((_,j)=>j!==k).map(s=>s.t).concat(R==='std'?STD_WRONG.slice(0,2):[])).slice(0,3)]);
+    return {label:name+' 빠진 단계',key:'orderMiss-'+R,stars:2,time:45,ask:`${name} 과정에서 빈칸에 들어갈 단계로 알맞은 것은?`,
+      body:`<div class="box"><span class="lab">실험 과정</span>${steps.map((s,j)=>`<div>(${KA[j]}) ${j===k?'<span class="blank">?</span>':s.t}</div>`).join('')}</div>${optBtns(opts,'cols2')}`,
+      setup(st,ctx){this.reveal=mcq(st,ctx,steps[k].t,`빈칸은 (${KA[k]}) 「${steps[k].t}」예요.`)}}},
+  orderSwap(r){const R=rangeOf(r),{steps,name}=stepsOf(R);let i,j;do{i=Math.floor(Math.random()*(steps.length-1));j=i+1+Math.floor(Math.random()*2)}while(j>=steps.length);
+    const shown=steps.map((s,x)=>({id:x,t:s.t}));[shown[i],shown[j]]=[shown[j],shown[i]];const chosen=new Set();
+    return {label:name+' 바뀐 순서 찾기',key:'orderSwap-'+R,stars:3,time:60,ask:`다음 ${name} 과정에서 순서가 서로 바뀐 두 단계를 고르시오.`,
+      body:`<div class="pool" id="sw">${shown.map((s,x)=>`<button class="card" data-x="${x}"><span class="n">(${KA[x]})</span>${s.t}</button>`).join('')}</div><div class="row"><button class="btn dark" id="sg" disabled>채점</button></div>`,
+      setup(st,ctx){const bs=[...st.querySelectorAll('#sw .card')];
+        bs.forEach(b=>b.onclick=()=>{if(ctx.answered)return;const x=+b.dataset.x;chosen.has(x)?chosen.delete(x):chosen.size<2&&chosen.add(x);bs.forEach(c=>c.style.background=chosen.has(+c.dataset.x)?'var(--pink-soft)':'');$('sg').disabled=chosen.size!==2});
+        const grade=()=>{bs.forEach(c=>{const x=+c.dataset.x;c.classList.toggle('ok',x===i||x===j);c.classList.toggle('no',chosen.has(x)&&x!==i&&x!==j)});$('sg').disabled=true;
+          ctx.finish(chosen.has(i)&&chosen.has(j),`바뀐 단계는 (${KA[i]})와 (${KA[j]})예요.`)};
+        $('sg').onclick=grade;this.reveal=grade}}},
+  toolChoose(r){const it=toolItem(r);const opts=shuffle([it.a,...shuffle(ALL_TOOLS.filter(t=>t!==it.a)).slice(0,4)]);
+    return {label:'기구 고르기',key:'toolChoose',stars:1,time:20,ask:'[ ? ]에 들어갈 실험 기구의 이름은?',body:toolBody(it)+optBtns(opts),
+      onFinish(ok){if(!ok){S.tools[it.a]=(S.tools[it.a]||0)+1;save()}},
+      setup(st,ctx){this.reveal=mcq(st,ctx,it.a,`정답은 <b>${ieyo(it.a)}</b>.`)}}},
+  toolWrite(r){const it=toolItem(r);const hand=S.prefs.hand;
+    return {label:'기구 이름 쓰기',key:'toolWrite',stars:2,time:hand?45:30,hand:true,ask:'[ ? ]에 들어갈 실험 기구의 이름을 쓰시오.',
+      body:toolBody(it)+`<div id="inp">${hand?padHTML():kbHTML()}</div>`,
+      onFinish(ok){if(!ok){S.tools[it.a]=(S.tools[it.a]||0)+1;save()}},
+      setup(st,ctx){const ans=`정답은 <b>${ieyo(it.a)}</b>.`;
+        const kb=()=>{$('inp').innerHTML=kbHTML();const go=()=>{const u=$('ta').value.trim();if(!u)return;$('ta').disabled=true;$('tg').disabled=true;const ok=sameName(u,it.a,2);ctx.finish(ok,ok?`<b>${it.a}</b>`:`${ans} (쓴 답: ${u})`)};
+          $('tg').onclick=go;$('ta').onkeydown=e=>{if(e.key==='Enter')go()};$('ta').focus({preventScroll:true})};
+        if(hand)setupPad(it.a,ctx,kb);else kb();
+        this.reveal=()=>ctx.finish(false,'시간이 끝났어요. '+ans)}}},
+  toolList(r){const R=rangeOf(r);const list=R==='std'?STD_TOOLS:TIT_TOOLS;const name=R==='std'?'표준 용액 제조':'중화 적정';
+    return {label:name+' 준비물 쓰기',key:'toolList-'+R,stars:3,time:180,ask:`${name} 실험에 필요한 실험 기구 ${list.length}가지를 모두 쓰시오.`,
+      body:`<p class="hint">한 줄에 하나씩, 또는 쉼표로 구분해서 쓰세요. 필요 없는 기구를 써도 감점은 없어요.</p><textarea class="ta" id="tl" placeholder="예) 비커"></textarea><div class="row"><button class="btn dark" id="tlg">채점</button></div>`,
+      setup(st,ctx){const grade=()=>{const lines=$('tl').value.split(/[\n,]+/);const hit=list.filter(t=>lines.some(l=>lineHas(l,t,2)));$('tl').disabled=true;$('tlg').disabled=true;
+          ctx.finish(hit.length===list.length,`${hit.length}/${list.length}가지 맞혔어요.<br>${list.map(t=>`<span class="${hit.includes(t)?'res-ok':'res-no'}">${hit.includes(t)?'○':'✕'} ${t}</span>`).join(' · ')}`)};
+        $('tlg').onclick=grade;this.reveal=grade}}},
+  calcMass(){const c=makeStd();const opts=numOpts(c.mass,[c.mass*10,c.mass/10,c.M*c.V*c.mw,c.mass*2,c.mass/2]);
+    return {label:'시료 질량 계산',key:'calcMass',stars:2,time:60,ask:`${c.M} M ${c.f}(aq) ${c.V} mL를 만들 때 필요한 ${c.f}(s)의 질량(g)은? (단, ${c.f}의 화학식량은 ${c.mw}이다.)`,
+      body:optBtns(opts),setup(st,ctx){this.reveal=mcq(st,ctx,fmt(c.mass),`몰수 = ${c.M} M × ${fmt(c.V/1000)} L = ${fmt(c.mol)} mol → 질량 = ${fmt(c.mol)} × ${c.mw} = <b>${fmt(c.mass)} g</b>`)}}},
+  calcDil(){let M,V1,V2,want;do{M=pick([0.1,0.2,0.25,0.5,1,2]);V1=pick([10,20,25,50]);V2=pick([100,200,250,500]);want=pick(['M2','V1'])}while(!nice(M*V1/V2));
+    const M2=M*V1/V2;const ask=want==='M2'?`${M} M 용액 ${V1} mL에 증류수를 넣어 ${V2} mL로 만들었다. 이 용액의 몰 농도(M)는?`:`${M} M 용액에 증류수를 넣어 ${fmt(M2)} M 용액 ${V2} mL를 만들려고 한다. 필요한 ${M} M 용액의 부피(mL)는?`;
+    const ans=want==='M2'?M2:V1;const opts=numOpts(ans,want==='M2'?[M*V2/V1,M2*10,M2/10,M-M2]:[V1*10,V2-V1,V1/2,V1*2]);
+    return {label:'희석 계산',key:'calcDil',stars:2,time:60,ask,body:optBtns(opts),
+      setup(st,ctx){this.reveal=mcq(st,ctx,fmt(ans),`희석해도 용질의 양(mol)은 그대로예요. MV = M′V′ → ${M} × ${V1} = ${fmt(M2)} × ${V2} → <b>${fmt(ans)}${want==='M2'?' M':' mL'}</b>`)}}},
+  calcPoint(){const c=makeTit();const a=c.acid;const hmol=a.n*c.Ma*c.Va/1000;const opts=numOpts(c.Vb,[c.Vb*2,c.Vb/2,c.Ma*c.Va/c.Mb,c.Vb*a.n,c.Vb+5]);
+    return {label:'이론적 중화점',key:'calcPoint',stars:3,time:90,ask:`${fmt(c.Ma)} M ${a.f}(aq) ${c.Va} mL를 ${c.Mb} M NaOH(aq)으로 적정할 때, 이론적 중화점까지 넣어야 하는 NaOH(aq)의 부피(mL)는?`,
+      body:optBtns(opts),setup(st,ctx){this.reveal=mcq(st,ctx,fmt(c.Vb),`H⁺의 양 = ${a.n} × ${fmt(c.Ma)} M × ${fmt(c.Va/1000)} L = ${fmt(hmol)} mol = 필요한 OH⁻의 양<br>NaOH 부피 = ${fmt(hmol)} ÷ ${c.Mb} M = ${fmt(hmol/c.Mb)} L = <b>${fmt(c.Vb)} mL</b>${a.n===2?'<br>황산은 2가 산이라 n = 2예요.':''}`)}}},
+  calcUnknown(){const c=makeTit();const opts=numOpts(c.Ma,[c.Ma*2,c.Ma/2,c.Mb*c.Vb/c.Va*(c.acid.n===2?1:2),c.Ma*10,c.Mb]);
+    return {label:'미지 농도 구하기',key:'calcUnknown',stars:3,time:120,ask:`미지 농도의 ${c.acid.f}(aq) ${c.Va} mL를 ${c.Mb} M NaOH(aq)으로 3회 적정한 결과이다. ${c.acid.f}(aq)의 몰 농도(M)는?`,
+      body:`<div class="box"><span class="lab">실험 결과</span>${runTable(c)}</div>`+optBtns(opts),
+      setup(st,ctx){this.reveal=mcq(st,ctx,fmt(c.Ma),solveText(c,false))}}},
+  calcReal(){return pick([realDil,realVinegar,realBogi])()},
+};
+function runTable(c){return `<table class="rub"><tr><th>실험</th><th>처음 눈금(mL)</th><th>나중 눈금(mL)</th></tr>${c.runs.map((r,i)=>`<tr><td>${i+1}</td><td>${r[0].toFixed(2)}</td><td>${r[1].toFixed(2)}</td></tr>`).join('')}</table>`}
+function solveText(c,orig){const v=c.runs.map(r=>+(r[1]-r[0]).toFixed(2));
+  return `소모 부피 = ${v.join(', ')} mL → 평균 ${c.Vb.toFixed(2)} mL<br>nMV = n′M′V′ → ${c.acid.n} × x × ${c.Va} = 1 × ${c.Mb} × ${c.Vb.toFixed(2)} → x = <b>${fmt(c.Ma)} M</b>${orig?`<br>10배 희석한 용액이었으므로 원래 농도 = ${fmt(c.Ma)} × 10 = <b>${fmt(c.orig)} M</b>`:''}${c.acid.n===2?'<br>황산(H₂SO₄)은 2가 산이라 n = 2예요.':''}`}
+function realDil(){let c;do{c=makeTit()}while(c.dil!==10);const opts=numOpts(c.orig,[c.Ma,c.orig*2,c.orig/2,c.orig*c.acid.n,c.orig/c.acid.n,c.orig*10]);
+  return {label:'실전: 희석 후 적정',key:'calcReal',stars:4,time:150,ask:'다음은 중화 적정 실험이다.',
+    body:`<div class="box"><span class="lab">실험 과정</span><div>(가) 미지 농도의 ${c.acid.f}(aq) 10 mL에 증류수를 넣어 100 mL로 만든다.</div><div>(나) (가)의 수용액 ${c.Va} mL를 삼각 플라스크에 넣고 페놀프탈레인 용액을 2~3방울 떨어뜨린다.</div><div>(다) ${c.Mb} M NaOH(aq)을 뷰렛에 넣고, 용액 전체가 붉은색으로 변하는 순간까지 넣는다. (3회 반복)</div></div>
+      <div class="box"><span class="lab">실험 결과</span>${runTable(c)}</div><p class="ask">(가)에서 희석하기 전 ${c.acid.f}(aq)의 몰 농도(M)는?</p>`+optBtns(opts),
+    setup(st,ctx){this.reveal=mcq(st,ctx,fmt(c.orig),solveText(c,true))}}}
+function realVinegar(){for(;;){const V0=pick([5,10]),V1=pick([50,100]),Vt=pick([10,20,25]),Mb=pick([0.1,0.2,0.25]),Vb=pick([8,10,12,15,16,20,24,25]);
+  const mol=Mb*Vb/1000,cd=mol/(Vt/1000),orig=cd*V1/V0,mass=orig*0.1*60;if(!nice(orig)||!nice(mass))continue;
+  const ask2=Math.random()<.5;const ans=ask2?mass:orig;const opts=numOpts(ans,ask2?[mass*10,mass/10,cd*0.1*60,mass*2,mass/2]:[cd,orig*2,orig/2,orig*10,orig/10]);
+  return {label:'실전: 식초 속 아세트산',key:'calcReal',stars:4,time:150,ask:'다음은 식초 속 아세트산(CH₃COOH)의 양을 구하기 위한 중화 적정 실험이다.',
+    body:`<div class="box"><span class="lab">실험 과정</span><div>(가) 식초 ${V0} mL에 증류수를 넣어 ${V1} mL 수용액을 만든다.</div><div>(나) (가)의 수용액 ${Vt} mL를 삼각 플라스크에 넣고 페놀프탈레인 용액을 2~3방울 떨어뜨린다.</div><div>(다) ${Mb} M NaOH(aq)을 넣으며, 용액 전체가 붉은색으로 변하는 순간까지 넣어 준 부피(V)를 측정한다.</div></div>
+      <div class="box"><span class="lab">실험 결과</span>V = ${Vb} mL</div><p class="ask">${ask2?'식초 100 mL에 들어 있는 CH₃COOH의 질량(g)은? (단, CH₃COOH의 분자량은 60이다.)':'식초 속 CH₃COOH의 몰 농도(M)는?'}</p>`+optBtns(opts),
+    setup(st,ctx){this.reveal=mcq(st,ctx,fmt(ans),`OH⁻의 양 = ${Mb} × ${fmt(Vb/1000)} L = ${fmt(mol)} mol = (나)의 CH₃COOH 양<br>(가)의 농도 = ${fmt(mol)} ÷ ${fmt(Vt/1000)} L = ${fmt(cd)} M<br>식초의 농도 = ${fmt(cd)} × ${V1/V0}(희석 배수) = <b>${fmt(orig)} M</b>${ask2?`<br>식초 100 mL 속 = ${fmt(orig)} × 0.1 L × 60 = <b>${fmt(mass)} g</b>`:''}`)}}}}
+function realBogi(){const c=makeTit();const OPT=['ㄱ','ㄷ','ㄱ, ㄴ','ㄴ, ㄷ','ㄱ, ㄴ, ㄷ'];const ans=pick(OPT);const T={ㄱ:ans.includes('ㄱ'),ㄴ:ans.includes('ㄴ'),ㄷ:ans.includes('ㄷ')};
+  const avg=c.Vb,hm=c.acid.n*c.Ma*c.Va/1000;
+  const s1=`소모된 NaOH(aq)의 평균 부피는 ${fmt(T.ㄱ?avg:avg+pick([1,2,-1]))} mL이다.`;
+  const s2=`삼각 플라스크 속 ${c.acid.f}(aq)에 들어 있던 H⁺의 양은 ${fmt(T.ㄴ?hm:hm*pick([2,0.5]))} mol이다.`;
+  const s3=`적정한 ${c.acid.f}(aq)의 몰 농도는 ${fmt(T.ㄷ?c.Ma:c.Ma*pick([2,0.5]))} M이다.`;
+  return {label:'실전: 보기 고르기',key:'calcReal',stars:4,time:150,ask:`미지 농도의 ${c.acid.f}(aq) ${c.Va} mL에 페놀프탈레인 용액을 넣고 ${c.Mb} M NaOH(aq)으로 3회 적정한 결과이다. 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은?`,
+    body:`<div class="box"><span class="lab">실험 결과</span>${runTable(c)}</div><div class="box"><span class="lab">보기</span><div>ㄱ. ${s1}</div><div>ㄴ. ${s2}</div><div>ㄷ. ${s3}</div></div>`+optBtns(OPT),
+    setup(st,ctx){this.reveal=mcq(st,ctx,ans,`평균 부피 ${fmt(avg)} mL, H⁺의 양 = OH⁻의 양 = ${c.Mb} × ${fmt(avg/1000)} = ${fmt(hm)} mol, 농도 = ${fmt(c.Ma)} M → 정답 <b>${ans}</b>`)}}}
+
+/* ===== 기구 문제 데이터 ===== */
+function toolItem(r){const c=makeStd(BASES[0]),t=makeTit();
+  const L=[
+    {a:'전자저울',s:`[ ? ](으)로 ${c.f}(s) ${fmt(c.mass)} g을 정확히 잰다.`,r:'std',img:'std1'},
+    {a:'질량 접시',s:'고체 시료를 [ ? ]에 올려놓고 질량을 잰다.',r:'std',img:'std1'},
+    {a:'약숟가락',s:'[ ? ](으)로 시약병의 고체 시료를 조금씩 덜어 낸다.',r:'std',img:'std1'},
+    {a:'비커',s:'잰 시료를 [ ? ]에 넣고 증류수를 적당량 부어 녹인다.',r:'std',img:'std2'},
+    {a:'유리 막대',s:'증류수를 붓고 [ ? ](으)로 저어 시료를 완전히 녹인다.',r:'std',img:'std2'},
+    {a:'깔때기',s:`[ ? ]을(를) 이용해 녹인 용액을 ${c.V} mL 부피 플라스크에 옮긴다.`,r:'std',img:'std3'},
+    {a:'부피 플라스크',s:`정확히 ${c.V} mL의 표준 용액을 만들기 위해 [ ? ]을(를) 사용한다.`,r:'std',img:'std4'},
+    {a:'씻기병',s:'[ ? ](으)로 증류수를 표시선까지 정확하게 채운다.',r:'std',img:'std5'},
+    {a:'부피 플라스크',s:`미지 농도의 ${t.acid.f}(aq)을 [ ? ](으)로 정확히 1/10로 희석한다.`,r:'tit',img:'tit1'},
+    {a:'피펫',s:`[ ? ](으)로 희석한 ${t.acid.f}(aq) ${t.Va} mL를 정확히 취한다.`,r:'tit',img:'tit2'},
+    {a:'피펫 필러',s:'피펫에 용액을 빨아올릴 때는 입 대신 [ ? ]을(를) 사용한다.',r:'tit',img:'tit2'},
+    {a:'삼각 플라스크',s:'적정할 산 수용액과 지시약은 [ ? ]에 넣는다.',r:'tit',img:'tit2'},
+    {a:'스포이드',s:'[ ? ](으)로 페놀프탈레인 용액을 2~3방울 떨어뜨린다.',r:'tit',img:'tit3'},
+    {a:'깔때기',s:`[ ? ]을(를) 이용해 ${t.Mb} M NaOH(aq)을 뷰렛에 넣는다.`,r:'tit',img:'tit4'},
+    {a:'비커',s:'뷰렛 꼭지 아래에 빈 [ ? ]을(를) 대고 꼭지를 열어 꼭지 아래까지 용액을 채운다.',r:'tit',img:'tit5'},
+    {a:'뷰렛',s:'NaOH(aq)을 넣은 [ ? ]의 처음 눈금과 나중 눈금을 읽는다.',r:'tit',img:'tit6'},
+    {a:'교반기',s:'삼각 플라스크를 [ ? ] 위에 올려놓고 작동한다.',r:'tit',img:'tit7'},
+    {a:'교반 자석',s:'용액이 잘 섞이도록 삼각 플라스크에 [ ? ]을(를) 넣는다.',r:'tit',img:'tit7'},
+    {a:'뷰렛 집게',s:'뷰렛을 [ ? ](으)로 스탠드에 수직으로 고정한다.',r:'tit',img:'setup'},
+    {a:'스탠드',s:'뷰렛 집게를 [ ? ]에 고정해 뷰렛을 세운다.',r:'tit',img:'setup'},
+  ];
+  const it=pick(r==='all'?L:L.filter(x=>x.r===r));return {...it,ctx:it.r==='std'?c:t};
+}
+const toolBody=it=>`<div class="box" style="overflow:hidden"><div class="qimg qart">${ART(it.img,it.ctx)}</div><span class="lab">실험 과정</span><br>${it.s.replace('[ ? ]','<span class="blank">?</span>')}</div>`;
+const kbHTML=()=>`<div class="row" style="align-items:center"><input class="ans" id="ta" placeholder="기구 이름을 쓰세요" autocomplete="off"><button class="btn dark" id="tg">채점</button></div>`;
+
+/* ===== 손글씨 (Google 입력 도구, 무료) ===== */
+const HW_API='https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8';
+const LV=[null,{n:5,fz:1,name:'1 · 설렁설렁'},{n:5,fz:0,name:'2 · 느슨'},{n:3,fz:0,name:'3 · 보통'},{n:2,fz:0,name:'4 · 깐깐'},{n:1,fz:0,name:'5 · 정자'}];
+const padHTML=()=>`<div class="padwrap"><canvas id="pad"></canvas><div class="ph" id="ph">여기에 기구 이름을 쓰세요</div></div>
+  <div class="row"><button class="btn" id="pUndo">되돌리기</button><button class="btn" id="pClear">지우기</button><button class="btn" id="pKb">키보드로</button><button class="btn dark" id="pGo">채점</button></div>
+  <div class="cands" id="cands">인식 난이도: ${(LV[S.prefs.lv]||LV[3]).name} · 인터넷 연결이 필요해요</div>`;
+function setupPad(answer,ctx,toKeyboard){
+  const c=$('pad'),g=c.getContext('2d');let strokes=[],ink=null,timer=null,busy=false,t0=0;
+  const fit=()=>{const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;g.setTransform(d,0,0,d,0,0);draw()};
+  const draw=()=>{const r=c.getBoundingClientRect();g.clearRect(0,0,r.width,r.height);g.lineWidth=4;g.lineCap='round';g.lineJoin='round';g.strokeStyle='#1f1d2b';
+    for(const s of strokes){g.beginPath();s.x.forEach((x,i)=>i?g.lineTo(x,s.y[i]):g.moveTo(x,s.y[i]));g.stroke()}};
+  const pt=e=>{const r=c.getBoundingClientRect();return [Math.round(e.clientX-r.left),Math.round(e.clientY-r.top),Math.round(performance.now()-t0)]};
+  c.onpointerdown=e=>{if(ctx.answered)return;c.setPointerCapture(e.pointerId);clearTimeout(timer);if(!strokes.length)t0=performance.now();const[x,y,t]=pt(e);ink={x:[x],y:[y],t:[t]};strokes.push(ink);$('ph').hidden=true;draw()};
+  c.onpointermove=e=>{if(!ink)return;const[x,y,t]=pt(e);ink.x.push(x);ink.y.push(y);ink.t.push(t);draw()};
+  const up=()=>{if(!ink)return;ink=null;if(S.prefs.auto)timer=setTimeout(grade,1600)};
+  c.onpointerup=up;c.onpointercancel=up;
+  $('pUndo').onclick=()=>{strokes.pop();draw();if(!strokes.length)$('ph').hidden=false};
+  $('pClear').onclick=()=>{strokes=[];draw();$('ph').hidden=false};
+  $('pKb').onclick=()=>{clearTimeout(timer);toKeyboard()};
+  $('pGo').onclick=()=>grade();
+  async function grade(){if(busy||ctx.answered||!strokes.length)return;busy=true;$('cands').textContent='인식 중…';
+    try{const r=c.getBoundingClientRect();
+      const res=await fetch(HW_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({options:'enable_pre_space',requests:[{writing_guide:{writing_area_width:Math.round(r.width),writing_area_height:Math.round(r.height)},ink:strokes.map(s=>[s.x,s.y,s.t]),language:'ko'}]})});
+      const j=await res.json();if(j[0]!=='SUCCESS')throw 0;const cands=j[1][0][1]||[];
+      const L=LV[S.prefs.lv]||LV[3];const top=cands.slice(0,L.n);
+      const ok=top.some(x=>sameName(x,answer,L.fz?3:2));
+      $('cands').innerHTML='인식 후보: '+(cands.slice(0,5).map(x=>`「${x}」`).join(' ')||'(읽은 글자 없음)');
+      ctx.finish(ok,ok?`<b>${answer}</b>`:`정답은 <b>${ieyo(answer)}</b>.${cands.slice(L.n).some(x=>sameName(x,answer,2))?' 정답이 뒤쪽 후보에 있었어요. 조금 더 또박또박 쓰면 통과예요!':''}`);
+    }catch(e){$('cands').textContent='인식 서버에 연결하지 못했어요. 인터넷 연결을 확인하거나 「키보드로」를 눌러 주세요.'}
+    busy=false}
+  requestAnimationFrame(fit);
+}
+
+/* ===== 개념 ===== */
+function renderConcept(){
+  const C=[
+    ['몰 농도','용액 1 L 속에 녹아 있는 용질의 양(mol)이에요.','몰 농도(M) = 용질의 양(mol) ÷ 용액의 부피(L)','필요한 용질 질량 = 몰 농도 × 부피(L) × 화학식량. 예) 0.2 M NaOH 250 mL → 0.2 × 0.25 × 40 = 2 g'],
+    ['표준 용액','농도를 정확히 알고 있는 용액이에요. 미지 용액의 농도를 알아낼 때 기준이 돼요.','정확한 부피 → 부피 플라스크','용질을 비커에서 먼저 녹인 뒤 부피 플라스크로 옮기고, 표시선까지 채워요. 물 100 mL에 녹이면 용액이 100 mL보다 많아져서 농도가 낮아져요.'],
+    ['희석','물을 더 넣어도 녹아 있는 용질의 양(mol)은 변하지 않아요.','MV = M′V′','혼합 용액의 몰 농도 = 몰수의 합 ÷ 부피의 합 (농도를 그냥 더하면 안 돼요)'],
+    ['중화 반응','산의 H⁺와 염기의 OH⁻가 1 : 1로 반응해 물이 생겨요.','H⁺ + OH⁻ → H₂O','1가: HCl, CH₃COOH, NaOH, KOH · 2가: H₂SO₄, Ca(OH)₂ · 3가: H₃PO₄'],
+    ['중화 적정과 중화점','농도를 아는 염기(표준 용액)로 농도를 모르는 산의 농도를 알아내는 방법이에요. H⁺의 양 = OH⁻의 양이 되는 지점이 중화점이에요.','n M V = n′ M′ V′ (n: 가수)','이론적 중화점: 산의 H⁺ 양을 먼저 구하고, 그만큼의 OH⁻가 들어 있는 염기 부피를 구해요. 희석했다면 마지막에 희석 배수를 곱해요.'],
+    ['지시약','색 변화로 중화 반응이 끝났는지 알려 줘요.','페놀프탈레인: 산성·중성 무색 → 염기성 붉은색','메틸 오렌지: 붉은색(산) → 노란색 · BTB: 노란색(산) → 초록색(중) → 파란색(염기)'],
+    ['실험 기구 정리','표준 용액 8가지, 중화 적정 12가지를 외워 두세요.',`표준 용액: ${STD_TOOLS.join(', ')}`,`중화 적정: ${TIT_TOOLS.join(', ')}`],
+    ['안전 물품','수산화 나트륨은 피부를 상하게 하는 강한 염기예요.',SAFE.join(', '),'유리 기구는 떨어뜨리지 않도록 조심해요.'],
+  ];
+  $('stage').innerHTML=C.map((c,i)=>`<div class="ccard"><h3><span class="num">${i+1}</span>${c[0]}</h3><div>${c[1]}</div><div class="f">${c[2]}</div><div class="hint" style="font-size:14px">${c[3]}</div></div>`).join('')
+    +`<div class="row"><button class="btn dark" data-sub="ox">O/X로 확인하기</button></div>`;
+}
+const OX=()=>{const c=makeStd(),t=makeTit();return [
+  {s:`${c.M} M ${c.f}(aq) ${c.V} mL를 만들려면 ${c.f}(s) ${fmt(c.mass)} g이 필요하다.`,a:true,e:`${c.M} × ${fmt(c.V/1000)} × ${c.mw} = ${fmt(c.mass)} g`},
+  {s:`${c.M} M ${c.f}(aq) ${c.V} mL를 만들려면 ${c.f}(s) ${fmt(c.mass*10)} g이 필요하다.`,a:false,e:`부피를 L로 바꿔야 해요. ${c.M} × ${fmt(c.V/1000)} × ${c.mw} = ${fmt(c.mass)} g`},
+  {s:'표준 용액을 만들 때 고체 시료는 부피 플라스크에 바로 넣어 녹인다.',a:false,e:'비커에서 먼저 녹인 뒤 깔때기로 옮겨요.'},
+  {s:'비커를 증류수로 헹군 물도 부피 플라스크에 함께 넣는다.',a:true,e:'남은 용질까지 모두 옮겨야 농도가 정확해요.'},
+  {s:'부피 플라스크의 표시선에는 메니스커스의 가장 위쪽을 맞춘다.',a:false,e:'가장 아래쪽을 맞춰요.'},
+  {s:`용질 ${fmt(c.mass)} g을 증류수 ${c.V} mL에 녹이면 ${c.M} M 용액이 된다.`,a:false,e:'용액 전체 부피가 증류수 부피보다 커져서 농도가 낮아져요.'},
+  {s:'페놀프탈레인 용액은 산성에서 붉은색을 띤다.',a:false,e:'산성·중성에서 무색, 염기성에서 붉은색이에요.'},
+  {s:'중화 적정에서 삼각 플라스크 속 용액 전체가 붉은색으로 변하는 순간 꼭지를 잠근다.',a:true,e:'이 지점이 중화점에 가장 가까운 지점이에요.'},
+  {s:'중화점에서는 H⁺의 양(mol)과 OH⁻의 양(mol)이 같다.',a:true,e:'H⁺ : OH⁻ = 1 : 1로 반응해요.'},
+  {s:'황산(H₂SO₄)은 1가 산이다.',a:false,e:'H⁺를 2개 내놓는 2가 산이에요.'},
+  {s:'물을 넣어 희석해도 용액 속 용질의 양(mol)은 변하지 않는다.',a:true,e:'MV = M′V′가 성립하는 이유예요.'},
+  {s:`${t.acid.f}(aq) ${t.Va} mL를 ${t.Mb} M NaOH(aq)으로 적정했더니 ${t.Vb} mL가 들었다. ${t.acid.f}(aq)의 농도는 ${fmt(t.Ma)} M이다.`,a:true,e:`${t.acid.n} × x × ${t.Va} = 1 × ${t.Mb} × ${t.Vb} → x = ${fmt(t.Ma)} M`},
+  {s:`${t.acid.f}(aq) ${t.Va} mL를 ${t.Mb} M NaOH(aq)으로 적정했더니 ${t.Vb} mL가 들었다. ${t.acid.f}(aq)의 농도는 ${fmt(t.Ma*(t.acid.n===2?2:0.5))} M이다.`,a:false,e:`${t.acid.n} × x × ${t.Va} = 1 × ${t.Mb} × ${t.Vb} → x = ${fmt(t.Ma)} M`},
+  {s:'피펫에 용액을 빨아올릴 때는 피펫 필러를 사용한다.',a:true,e:'입으로 빨면 위험해요.'},
+  {s:'NaOH(aq)을 뷰렛에 넣은 뒤 꼭지 아래의 공기는 빼지 않아도 된다.',a:false,e:'꼭지 아래까지 용액을 채워야 부피를 정확히 잴 수 있어요.'},
+  {s:'뷰렛 눈금은 최소 눈금의 1/10까지 어림하여 읽는다.',a:true,e:'예) 25.30 mL처럼 읽어요.'},
+  {s:'10배 희석한 산으로 적정했다면, 구한 농도에 10을 곱해야 원래 농도가 된다.',a:true,e:'희석 배수를 곱해요.'},
+  {s:'교반기에서 삼각 플라스크를 꺼낼 때는 다이얼을 0으로 맞춘다.',a:true,e:'교반 자석이 튀지 않게 해요.'},
+]};
+
+/* ===== 과정 ===== */
+function renderProc(){
+  const tit=V.sub==='tit',c=tit?makeTit():makeStd();const steps=tit?TIT_STEPS(c):STD_STEPS(c);
+  const cond=tit?`${c.Mb} M NaOH(aq) 표준 용액으로 미지 농도의 ${c.acid.name}(${c.acid.f})을 적정 ${c.dil===10?'(1/10 희석 후 ':'('}${c.Va} mL 사용)`:`${c.M} M ${c.name}(${c.f}) 수용액 ${c.V} mL 만들기 · 화학식량 ${c.mw}`;
+  $('stage').innerHTML=`<div class="tools"><span>${steps.length}단계</span><button id="pOpen">전부 펼치기</button><button id="pClose">전부 접기</button><button id="pNew">다른 조건으로</button></div>
+   <div class="box"><span class="lab">이번 조건</span><br>${cond}</div>
+   ${tit?`<div class="animrow"><div><div class="photo">${ART('setupL',c)}</div><p class="cap">중화 적정 장치</p></div><div><div class="photo">${svgTitration()}</div><p class="cap">움직임: 방울이 떨어지다 분홍색으로 변하는 순간</p></div></div>`:''}`+
+   steps.map((s,i)=>`<details class="step" ${i<2?'open':''}><summary><span class="num">${i+1}</span>${s.t}</summary>
+    <div class="inner"><div class="photo">${ART(s.img,c)}</div>
+    <div><div class="why" style="margin-top:0"><b>왜?</b> ${s.why}</div></div></div></details>`).join('')+
+   `<div class="row"><button class="btn dark" data-tab="order">순서 문제 풀기</button></div>`;
+  $('pOpen').onclick=()=>document.querySelectorAll('.step').forEach(d=>d.open=true);
+  $('pClose').onclick=()=>document.querySelectorAll('.step').forEach(d=>d.open=false);
+  $('pNew').onclick=render;
+}
+function svgFlask(){return `<svg viewBox="0 0 120 150"><rect width="120" height="150" fill="#f4f1fb"/>
+ <path d="M52 10h16v52l26 40a22 22 0 0 1-19 34H45a22 22 0 0 1-19-34l26-40z" fill="#fff" stroke="#555" stroke-width="2"/>
+ <clipPath id="fc"><path d="M52 10h16v52l26 40a22 22 0 0 1-19 34H45a22 22 0 0 1-19-34l26-40z"/></clipPath>
+ <g clip-path="url(#fc)"><rect class="anim-fill" x="20" y="34" width="80" height="104" fill="#cfe3f7"/></g>
+ <line x1="48" y1="34" x2="72" y2="34" stroke="#e2557a" stroke-width="2"/><text x="76" y="37" font-size="9" fill="#e2557a">표시선</text></svg>`}
+function svgTitration(){return `<svg viewBox="0 0 140 170"><rect width="140" height="170" fill="#f4f1fb"/>
+ <rect x="14" y="10" width="6" height="150" fill="#888"/><rect x="10" y="158" width="110" height="8" fill="#555"/><rect x="20" y="40" width="40" height="5" fill="#666"/>
+ <rect x="62" y="8" width="12" height="96" fill="#fff" stroke="#555"/>
+ <clipPath id="bc"><rect x="63" y="9" width="10" height="94"/></clipPath><g clip-path="url(#bc)"><rect class="anim-level" x="63" y="14" width="10" height="100" fill="#cfe3f7"/></g>
+ <path d="M66 104h4v10h-4z" fill="#555"/><circle class="anim-drop" cx="68" cy="118" r="2.2" fill="#9cc4ec"/>
+ <path d="M58 122h20v8l18 24H40l18-24z" class="anim-pink" fill="#eef4fb" stroke="#555"/><rect x="36" y="150" width="64" height="8" fill="#ddd" stroke="#888"/>
+ <text x="84" y="40" font-size="9" fill="#555">뷰렛(NaOH)</text><text x="84" y="138" font-size="9" fill="#555">산 + 지시약</text></svg>`}
+function svgMeniscus(){return `<svg viewBox="0 0 140 150"><rect width="140" height="150" fill="#f4f1fb"/>
+ <rect x="50" y="10" width="40" height="130" fill="#fff" stroke="#555" stroke-width="2"/>
+ <path d="M51 70 Q70 86 89 70 V139 H51z" fill="#cfe3f7"/><line x1="40" y1="78" x2="100" y2="78" stroke="#e2557a" stroke-width="2" stroke-dasharray="4 3"/>
+ <text x="102" y="81" font-size="9" fill="#e2557a">표시선</text><circle cx="22" cy="78" r="7" fill="#fff" stroke="#555"/><circle cx="24" cy="78" r="3" fill="#555"/>
+ <text x="6" y="100" font-size="9" fill="#555">눈높이</text><text x="54" y="100" font-size="9" fill="#555">가장 아래쪽</text></svg>`}
+function renderAnim(){
+  $('stage').innerHTML=`<div class="animrow"><div><div class="photo">${svgFlask()}</div><p class="cap">부피 플라스크: 표시선까지 채우기</p></div><div><div class="photo">${svgMeniscus()}</div><p class="cap">메니스커스: 눈높이를 맞추고 가장 아래쪽을 표시선에</p></div></div>
+   <div class="animrow"><div><div class="photo">${svgTitration()}</div><p class="cap">적정: 방울이 떨어지다 전체가 분홍색으로 변하면 멈춤</p></div><div><div class="photo">${ART('endpoint')}</div><p class="cap">중화점에서 색이 바뀌는 순간</p></div></div>`;
+}
+
+/* ===== 파이널 ===== */
+const ROUNDS=[
+  {n:'종합 테스트 1회',d:'개념 O/X 3 · 순서 2 · 기구 2 · 계산 3',q:['ox','ox','ox','orderAll','orderMiss','toolChoose','toolChoose','calcMass','calcPoint','calcReal']},
+  {n:'종합 테스트 2회',d:'개념 O/X 2 · 순서 2 · 기구 쓰기 2 · 계산 4',q:['ox','ox','orderSwap','orderAll','toolWrite','toolWrite','calcDil','calcUnknown','calcReal','calcReal']},
+  {n:'종합 테스트 3회',d:'계산 위주: 질량 · 희석 · 중화점 · 미지 농도 · 실전 3',q:['ox','orderMiss','toolChoose','calcMass','calcDil','calcPoint','calcUnknown','calcReal','calcReal','calcReal']},
+];
+function renderFinal(){
+  $('stage').innerHTML=`<p style="font-size:15px">종합 테스트는 매번 숫자가 바뀌는 10문항이에요. 수행평가 모드는 실제 채점표(100점, 11항목)대로 응시하고 <b>엄격 · 보통 · 관대</b> 세 기준의 점수를 한 번에 보여 줘요.</p>`+
+   `<div class="wl"><div><b style="font-family:var(--ui)">수행평가 모드</b> <span class="proto">실전</span><div class="hint">표준 용액 제조 → 중화 적정 → 중화점 계산 · 최고 ${S.best==null?'기록 없음':S.best+'점(보통 기준)'}</div></div><button class="btn dark" id="exGo">시작</button></div>`+
+   ROUNDS.map((r,i)=>`<div class="wl"><div><b style="font-family:var(--ui)">${r.n}</b><div class="hint">${r.d}</div></div><button class="btn dark" data-round="${i}">시작</button></div>`).join('');
+  $('exGo').onclick=startExam;
+  $('stage').querySelectorAll('[data-round]').forEach(b=>b.onclick=()=>runRound(ROUNDS[+b.dataset.round]));
+}
+function runRound(r){
+  const res=[];let i=0;
+  const go=()=>mountQ(r.q[i],{range:'all',index:[i+1,r.q.length],nextLabel:i===r.q.length-1?'결과 보기':'다음',
+    onAnswer:(ok,label)=>res[i]={ok,label},next:()=>{i++;i<r.q.length?go():done()}});
+  const done=()=>{const n=res.filter(x=>x&&x.ok).length;
+    $('stage').innerHTML=`<div class="sec"><h3>${r.n} 결과</h3><div class="score3" style="grid-template-columns:1fr"><div class="s2"><span>맞힌 문제</span><b>${n} / ${r.q.length}</b></div></div>
+     <table class="rub"><tr><th>번호</th><th>문제</th><th>결과</th></tr>${res.map((x,j)=>`<tr><td>${j+1}</td><td>${x?x.label:'-'}</td><td class="${x&&x.ok?'res-ok':'res-no'}">${x&&x.ok?'○':'✕'}</td></tr>`).join('')}</table>
+     <p class="hint">틀린 문제 유형은 오답 탭에 모였어요. 다시 풀면 숫자가 바뀐 새 문제가 나와요.</p><div class="row"><button class="btn" data-tab="final">파이널 목록</button><button class="btn dark" id="again">한 번 더</button></div></div>`;
+    $('again').onclick=()=>runRound(r)};
+  go();
+}
+
+/* ===== 수행평가 모드 ===== */
+let EX=null;
+function startExam(){
+  stopTimer();const base=pick(BASES);const std=makeStd(base);let tit;do{tit=makeTit(std.M,base)}while(!tit);
+  EX={std,tit,base};
+  const pre=tit.dil===10?`미지 농도의 ${tit.acid.name}(${tit.acid.f}) 10 mL를 100 mL로 희석한 뒤 ${tit.Va} mL`:`미지 농도의 ${tit.acid.name}(${tit.acid.f}) ${tit.Va} mL`;
+  EX.taken=tit.dil===10?[10,100,tit.Va]:[tit.Va];
+  const T=(id,ph)=>`<textarea class="ta" id="${id}" placeholder="${ph}"></textarea>`;
+  $('stage').innerHTML=`<div class="box"><span class="lab">문제 상황</span><br>
+   ${std.M} M ${base.name}(${base.f}) 표준 용액 ${std.V} mL를 만들고, 이 표준 용액으로 ${pre}를 중화 적정하려고 한다. (${base.f}의 화학식량: ${base.mw})<br>
+   단, 적정할 ${tit.acid.f}(aq)의 농도는 약 ${fmt(tit.Ma)} M으로 예상된다.</div>
+   ${S.prefs.ta?`<div class="tbar"><i id="tbar" style="width:100%"></i></div><div class="hint" style="text-align:right">남은 시간 <b id="tleft"></b> (40분)</div>`:''}
+   <p class="hint">한 줄에 하나씩, 또는 쉼표로 구분해서 쓰세요.</p>
+   <div class="sec"><h3>1. 미지 시료 및 표준 용액 제조 실험 구성<small>27점</small></h3>
+    <p><b>① 화학 물질과 양</b> (부피·농도·질량까지, 7가지)</p>${T('e1','예) 증류수')}
+    <p><b>② 실험 기구</b> (8가지)</p>${T('e2','예) 비커')}
+    <p><b>③ 안전 물품</b> (2가지)</p>${T('e3','')}</div>
+   <div class="sec"><h3>2. 표준 용액 제조 과정<small>24점</small></h3>
+    <div class="field">④ 필요한 시료의 질량: <input id="e4"> g</div>
+    <div class="field">⑤ 사용하는 부피 플라스크의 부피: <input id="e5"> mL</div>
+    <p><b>⑥ 용액 제조 순서</b> (필요한 단계만 골라 순서대로. 틀린 카드가 섞여 있어요)</p><div id="e6"></div></div>
+   <div class="sec"><h3>3. 중화 적정 실험 구성<small>29점</small></h3>
+    <p><b>⑦ 화학 물질</b> (3가지)</p>${T('e7','')}
+    <p><b>⑧ 실험 기구와 수량</b> (12가지, 예: 뷰렛 1개)</p>${T('e8','예) 뷰렛 1개')}
+    <p><b>⑨ 안전 물품과 수량</b> (4가지)</p>${T('e9','')}</div>
+   <div class="sec"><h3>4. 중화 적정 양적 계산<small>20점</small></h3>
+    <p>${tit.acid.f}(aq)의 농도를 ${fmt(tit.Ma)} M이라고 할 때, ${tit.Va} mL를 ${std.M} M ${base.f}(aq)으로 적정하는 이론적 중화점을 구하시오.</p>
+    <div class="field">⑩ 계산 과정: ${tit.acid.f} ${tit.Va} mL 속 H⁺의 양 <input id="e10a"> mol → 필요한 OH⁻의 양 <input id="e10b"> mol</div>
+    <div class="field">⑪ 이론적 중화점: ${base.f}(aq) <input id="e11"> mL</div></div>
+   <div class="row"><button class="btn" data-tab="final">그만두기</button><button class="btn dark" id="exSubmit">제출하고 채점</button></div>`;
+  const items=[...STD_STEPS(std).map((s,i)=>({id:i,t:s.t})),...shuffle(STD_WRONG).slice(0,2).map((t,i)=>({id:'w'+i,t}))];
+  EX.w=orderWidget($('e6'),items);
+  $('exSubmit').onclick=gradeExam;
+  if(S.prefs.ta)startTimer(40*60,gradeExam);
+  window.scrollTo({top:$('stage').offsetTop-10,behavior:'smooth'});
+}
+const nums=t=>(String(t).replace(/[₀-₉]/g,d=>'₀₁₂₃₄₅₆₇₈₉'.indexOf(d)).replace(/H2SO4|CH3COOH|H2O/gi,'').match(/\d+(\.\d+)?/g)||[]).map(Number);
+const near=(a,b,tol)=>Math.abs(a-b)<=Math.max(1e-9,Math.abs(b)*tol);
+function gradeExam(){
+  stopTimer();const {std,tit,base}=EX;const v=id=>($(id).value||'');
+  const lines=id=>v(id).split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+  const out=[1,2,3].map(()=>({pts:[],notes:[]}));
+  const add=(lv,k,p,note)=>{out[lv-1].pts[k]=p;out[lv-1].notes[k]=note};
+  const T1=v('e1'),L1=lines('e1');
+  for(const lv of [1,2,3]){
+    const tol=lv===3?0.01:1e-9;
+    const numWithUnit=(x,unit)=>{const re=new RegExp('(\\d+(?:\\.\\d+)?)\\s*'+unit,'gi');let m,ok=false;while((m=re.exec(T1.replace(/㎖/g,'mL')))){if(near(+m[1],x,tol))ok=true}return ok};
+    const hasNum=x=>nums(T1).some(n=>near(n,x,tol));
+    const need=lv===1;
+    const chem=[
+      ['용질 '+base.f,L1.some(l=>sp(l).includes(sp(base.f))||sp(l).includes(sp(base.name))||(lv===3&&lineHas(l,base.name,3)))],
+      ['용질 질량 '+fmt(std.mass)+' g',need?numWithUnit(std.mass,'g'):hasNum(std.mass)],
+      ['증류수',L1.some(l=>sp(l).includes('증류수')||(lv>=2&&/^(물|정제수)/.test(sp(l))))],
+      ['표준 용액 농도 '+std.M+' M',need?numWithUnit(std.M,'M'):hasNum(std.M)],
+      ['표준 용액 부피 '+std.V+' mL',need?(numWithUnit(std.V,'mL')||numWithUnit(std.V/1000,'L')):(hasNum(std.V)||hasNum(std.V/1000))],
+      ['미지 시료 '+tit.acid.f,L1.some(l=>sp(l).includes(sp(tit.acid.plain))||sp(l).includes(sp(tit.acid.name))||sp(l).includes(sp(tit.acid.f)))],
+      ['미지 시료의 양 '+EX.taken[0]+' mL',need?EX.taken.some(x=>numWithUnit(x,'mL')):EX.taken.some(hasNum)],
+    ];
+    const k1=chem.filter(c=>c[1]).length;add(lv,0,4+k1,chem.map(c=>(c[1]?'○ ':'✕ ')+c[0]).join(' · '));
+    const k2=STD_TOOLS.filter(t=>lines('e2').some(l=>lineHas(l,t,lv)));add(lv,1,4+k2.length,`${k2.length}/8 · 빠짐: ${STD_TOOLS.filter(t=>!k2.includes(t)).join(', ')||'없음'}`);
+    const k3=SAFE.filter(t=>lines('e3').some(l=>lineHas(l,t,lv)));add(lv,2,2+Math.min(2,k3.length),`${Math.min(2,k3.length)}/2 (${k3.join(', ')||'없음'})`);
+    const m=nums(v('e4'))[0];const okm=m!=null&&near(m,std.mass,lv===3?0.01:1e-9);add(lv,3,okm?4:2,okm?'○':`✕ 정답 ${fmt(std.mass)} g`);
+    let fv=nums(v('e5'))[0];if(fv!=null&&fv<=1&&/L/i.test(v('e5'))&&!/mL/i.test(v('e5')))fv*=1000;const okv=fv!=null&&near(fv,std.V,1e-9);add(lv,4,okv?4:2,okv?'○':`✕ 정답 ${std.V} mL`);
+    const seq=EX.w.ans.map(s=>s.id);const hasWrong=seq.some(x=>typeof x==='string');
+    let okp;if(hasWrong)okp=false;else if(lv===1)okp=seq.length===6&&seq.every((x,j)=>x===j);
+    else{const core=seq.filter(x=>x!==3);const full=[0,1,2,4,5];
+      const inOrder=core.length===5&&core.every((x,j)=>x===full[j]);
+      const oneSwap=core.length===5&&(()=>{let d=0;for(let j=0;j<5;j++)if(core[j]!==full[j])d++;if(d!==2)return false;const i=core.findIndex((x,j)=>x!==full[j]);return core[i]===full[i+1]&&core[i+1]===full[i]})();
+      okp=lv===2?inOrder&&(seq.length===5||seq.indexOf(3)>seq.indexOf(2)&&seq.indexOf(3)<seq.indexOf(4)):(inOrder||oneSwap)}
+    add(lv,5,okp?16:6,okp?'○':hasWrong?'✕ 틀린 단계가 들어갔어요':lv===1?'✕ 6단계가 정확한 순서여야 해요':lv===2?'✕ 순서가 달라요':'✕ 두 칸 이상 어긋났어요');
+    const chem3=[[base.f,base.name],[tit.acid.plain,tit.acid.f,tit.acid.name],['페놀프탈레인']];
+    const k7=chem3.filter(a=>lines('e7').some(l=>a.some(n=>sp(l).includes(sp(n)))||(lv===3&&a.some(n=>n.length>=3&&lineHas(l,n,3))))).length;add(lv,6,2+k7,`${k7}/3`);
+    const L8=lines('e8');const k8=TIT_TOOLS.filter(t=>L8.some(l=>lineHas(l,t,lv)&&(lv>1||/\d|한|두|하나|둘/.test(l))));add(lv,7,6+k8.length,`${k8.length}/12${lv===1?' (수량까지)':''} · 빠짐: ${TIT_TOOLS.filter(t=>!k8.includes(t)).join(', ')||'없음'}`);
+    const L9=lines('e9');const k9=SAFE.filter(t=>L9.some(l=>lineHas(l,t,lv)&&(lv>1||/\d|한|하나/.test(l))));add(lv,8,2+k9.length,`${k9.length}/4${lv===1?' (수량까지)':''}`);
+    const hm=tit.acid.n*tit.Ma*tit.Va/1000;const a=nums(v('e10a'))[0],b=nums(v('e10b'))[0];const tl=lv===3?0.02:1e-9;
+    const oka=a!=null&&near(a,hm,tl),okb=b!=null&&near(b,hm,tl);const okc=lv===1?oka&&okb:lv===2?(oka||okb):(oka||okb||a!=null&&near(a,tit.Ma*tit.Va/1000,tl));
+    add(lv,9,okc?10:5,okc?'○':`✕ H⁺ = OH⁻ = ${fmt(hm)} mol${tit.acid.n===2?' (황산은 2가)':''}`);
+    const f=nums(v('e11'))[0];const okf=f!=null&&near(f,tit.Vb,lv===1?1e-9:lv===2?0.005:0.02);add(lv,10,okf?10:5,okf?'○':`✕ 정답 ${fmt(tit.Vb)} mL`);
+  }
+  const tot=out.map(o=>o.pts.reduce((a,b)=>a+b,0));
+  S.best=Math.max(S.best||0,tot[1]);save();
+  const NAMES=['① 화학 물질과 양','② 실험 기구','③ 안전 물품','④ 시료 질량','⑤ 부피 플라스크','⑥ 제조 순서','⑦ 적정 화학 물질','⑧ 적정 기구와 수량','⑨ 안전 물품과 수량','⑩ 중화점 계산 과정','⑪ 이론적 중화점'];
+  const MAX=[11,12,4,4,4,16,5,18,6,10,10];
+  $('stage').innerHTML=`<div class="sec"><h3>수행평가 모드 결과</h3>
+    <div class="score3"><div class="s1"><span>엄격하게</span><b>${tot[0]}</b></div><div class="s2"><span>보통</span><b>${tot[1]}</b></div><div class="s3"><span>너그럽게</span><b>${tot[2]}</b></div></div>
+    <p class="hint">엄격: 정확한 명칭·단위·수량, 6단계 정확한 순서 · 보통: 흔히 쓰는 다른 이름 인정, 처음 섞기 단계 생략 허용 · 너그럽게: 한 글자 오타, 인접한 두 단계 뒤바뀜, 반올림 오차 허용</p>
+    <table class="rub"><tr><th>항목</th><th>만점</th><th>엄격</th><th>보통</th><th>너그럽게</th></tr>
+     ${NAMES.map((n,k)=>`<tr><td class="k">${n}</td><td>${MAX[k]}</td>${out.map(o=>`<td><b>${o.pts[k]}</b><div class="hint">${o.notes[k]}</div></td>`).join('')}</tr>`).join('')}
+     <tr><th>합계</th><th>100</th>${tot.map(t=>`<th>${t}</th>`).join('')}</tr></table>
+    <p class="hint">① 화학 물질 7가지는 안내문에 목록이 없어서, 앱이 정한 기준(용질·질량·증류수·농도·부피·미지 시료·미지 시료의 양)으로 채점했어요.</p></div>
+   <div class="sec"><h3>모범 답안</h3><ol class="lst">
+    <li>${base.f}(s) ${fmt(std.mass)} g, 증류수, ${std.M} M ${base.f}(aq) ${std.V} mL, 미지 농도 ${tit.acid.f}(aq) ${EX.taken.length>1?'10 mL (→ 100 mL로 희석)':tit.Va+' mL'}</li>
+    <li>${STD_TOOLS.join(', ')}</li><li>${SAFE.slice(0,3).join(', ')} 중 2가지</li><li>${std.M} × ${fmt(std.V/1000)} × ${base.mw} = ${fmt(std.mass)} g</li><li>${std.V} mL</li>
+    <li>${STD_STEPS(std).map(s=>s.t).join(' → ')}</li><li>${base.f}(aq) 표준 용액, 미지 농도 ${tit.acid.f}(aq), 페놀프탈레인 용액</li>
+    <li>${TIT_TOOLS.map(t=>t+' 1개').join(', ')}</li><li>${SAFE.map(t=>t+(t==='실험용 장갑'?' 1켤레':t==='실험복'?' 1벌':' 1개')).join(', ')}</li>
+    <li>H⁺ = ${tit.acid.n} × ${fmt(tit.Ma)} M × ${fmt(tit.Va/1000)} L = ${fmt(tit.acid.n*tit.Ma*tit.Va/1000)} mol = 필요한 OH⁻의 양</li>
+    <li>${fmt(tit.acid.n*tit.Ma*tit.Va/1000)} ÷ ${std.M} M = ${fmt(tit.Vb/1000)} L = <b>${fmt(tit.Vb)} mL</b></li></ol>
+    <div class="row"><button class="btn" data-tab="final">파이널 목록</button><button class="btn dark" id="exAgain">새 조건으로 다시</button></div></div>`;
+  $('exAgain').onclick=startExam;window.scrollTo({top:$('stage').offsetTop-10});
+}
+
+/* ===== 오답 ===== */
+function renderWrong(){
+  const W=Object.entries(S.wrong),T=Object.entries(S.tools).sort((a,b)=>b[1]-a[1]);
+  $('stage').innerHTML=`<h3 style="font-family:var(--title);font-weight:400;font-size:22px;margin:6px 0">틀린 문제 유형 ${W.length}개</h3>
+   ${W.length?W.map(([k,w])=>`<div class="wl"><div>${w.label} <span class="hint">· ${w.n}번 더 맞히면 사라져요</span></div><button class="btn dark" data-redo="${k}">다시 풀기</button></div>`).join(''):'<p class="hint" style="font-size:15px">아직 틀린 문제가 없어요. 문제를 풀면 틀린 유형이 여기 쌓여요.</p>'}
+   <h3 style="font-family:var(--title);font-weight:400;font-size:22px;margin:22px 0 6px">헷갈린 기구 ${T.length}개</h3>
+   ${T.length?`<p>${T.map(([t,n])=>`${t} <span class="hint">(${n})</span>`).join(' · ')}</p>`:'<p class="hint" style="font-size:15px">기구 문제에서 틀린 이름이 여기 모여요.</p>'}
+   <p style="margin-top:24px"><button class="tools" style="border:0;background:none;text-decoration:underline;font:14px var(--serif);padding:0" id="wClear">풀이 기록 전부 지우기</button></p>`;
+  $('stage').querySelectorAll('[data-redo]').forEach(b=>b.onclick=()=>{const k=b.dataset.redo;const [type,r]=k.split('-');mountQ(type,{range:r||'all'})});
+  $('wClear').onclick=()=>{if(!$('wClear').dataset.sure){$('wClear').dataset.sure=1;$('wClear').textContent='정말 지울까요? 한 번 더 누르면 지워져요';return}
+    S.done=0;S.right=0;S.wrong={};S.tools={};S.best=null;save();renderWrong()};
+}
+
+/* ===== 설정 ===== */
+$('gear').onclick=()=>{document.querySelectorAll('.tg').forEach(t=>t.classList.toggle('on',!!S.prefs[t.dataset.k]));$('lv').value=S.prefs.lv;$('lvName').textContent=LV[S.prefs.lv].name;$('settings').showModal()};
+document.querySelectorAll('.tg').forEach(t=>t.onclick=()=>{S.prefs[t.dataset.k]=!S.prefs[t.dataset.k];t.classList.toggle('on');save()});
+$('lv').oninput=e=>{S.prefs.lv=+e.target.value;$('lvName').textContent=LV[S.prefs.lv].name;save()};
+$('setClose').onclick=()=>{$('settings').close();render()};
+drawStats();nav();
+
+</script>
+</body>
+</html>
